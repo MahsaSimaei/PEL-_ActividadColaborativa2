@@ -2,7 +2,20 @@
 #include <string>
 using namespace std;
 
-
+// Función auxiliar para validar usuario y password y devolver código de rol
+int codigoRol(const string& nombre, const string& password) {
+    // Usuario: admin / admin123
+    // Usuario: profe / profe123
+    // Usuario: estudiante / estu123
+    if (nombre == "admin" && password == "admin123")
+        return 1;
+    else if (nombre == "profe" && password == "profe123")
+        return 2;
+    else if (nombre == "estudiante" && password == "estu123")
+        return 3;
+    else
+        return 0; // credenciales incorrectas
+}
 // Simulación de login y menú por rol usando switch
 int main() {
     string nombre, password;
