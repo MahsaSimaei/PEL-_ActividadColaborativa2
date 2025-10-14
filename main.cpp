@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include "MochilaDigital.h"
-#include "Estudiante.h"
+#include "Usuario.h"
 #include <limits>
 // Prototipos de los menús
 void menuAdministrador();

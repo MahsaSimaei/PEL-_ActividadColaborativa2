@@ -1,6 +1,6 @@
 #ifndef USUARIO_H
 #define USUARIO_H
-
+#include "MochilaDigital.h"
 #include <string>
 using std::string;
 
@@ -36,6 +36,29 @@ public:
         string estado = alta ? "Alta" : "Baja";
         return "ID: " + std::to_string(id) + " | " + nombre + " " + apellido + " (" + estado + ")";
     }
+};
+
+class Estudiante : public Usuario {
+private:
+    MochilaDigital* mochila; // En el heap
+
+public:
+    Estudiante() : Usuario() {
+        // Por defecto, usamos "mochila_default" como carpeta
+        mochila = new MochilaDigital("mochila_default");
+    }
+
+    Estudiante(std::string nombre, std::string apellido, std::string passwd, int id)
+        : Usuario(nombre, apellido, passwd, id) {
+        // Carpeta mochila personalizada por nombre de usuario
+        mochila = new MochilaDigital("mochila_" + nombre);
+    }
+
+    ~Estudiante() {
+        delete mochila;
+    }
+
+    MochilaDigital* getMochila() const { return mochila; }
 };
 
 #endif
