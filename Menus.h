@@ -117,13 +117,13 @@ void menuAdministrador() {
                 std::cout << "Estudiante dado de alta correctamente!" << std::ednl;
             }else if(tipo == 2){ //Profesor
                 profesores.append(Profesor(nombre,apellido,pass,id));
-                std::cout << "Profesor dado de alta correctamente! << std::endl;
+                std::cout << "Profesor dado de alta correctamente!" << std::endl;
                     }
             break;
         }
         case 2: { //Dar de baja usuario
             int id, tipo;
-            std::cout << "==== BAJA USUARIO: ====" std::endl;
+            std::cout << "==== BAJA USUARIO: ===="<< std::endl;
             std::cout << " 1. Ingrese el tipo de usuario: 1) Estudiante 2) Profesor " << std::endl;
             std::cin >> tipo;
             std::cout << " 2. Ingrese el id del usuario: " << std::endl;
@@ -157,5 +157,4 @@ void menuAdministrador() {
     }
 }
 }
-
 
