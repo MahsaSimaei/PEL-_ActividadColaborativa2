@@ -32,8 +32,8 @@ std::string getNombre() {
 std::string getUsuario() {
   return nombre;
 }
-std::string getPwd() {
-        return pwd;
+std::string getPasswd() {
+        return passwd;
     }
 
     bool isAlta() {
@@ -58,5 +58,85 @@ std::string getPwd() {
         ret += alta ? ", Esta de alta." : ", Esta de baja";
         return ret;
     }
+
+};
+class Estudiante : public Usuario {
+private:
+ ListaDeObjetos<FILE> *mochila;
+ ListaDeObjetos<double> *calificaciones;
+ std::string clase;
+public:
+ Estudiante () { }
+ Estudiante(std::string nombre, std::string apellido, std::string passwd, int id) : Usuario(nombre,apellido,passwd,id) {
+           mochila = new ListaDeObjetos<FILE> ();
+           calificaciones = new ListaDeObjetos<double>();
+           clase = "";
+ }
+void setClase(std::string clase){
+    this->clase = clase;
+std::string getClase()  {
+    return clase;
+}
+void agregarCalificaciones(double nota) {
+    calificaciones->append(nota);
+}
+double getCalificacion(int pos) {
+    return calificaciones->get(pos);
+}
+void eliminarCalificacion(int pos) {
+    calificaciones->erase(pos);
+}
+void agregarDoc(FILE doc) {
+   mochila->append(doc);
+}
+FILE getDoc(int pos) {
+   calificaciones->get(pos);
+}
+void eliminarDoc(int pos) {
+   calificaciones->erase(pos);
+}
+
+std::string toString() {
+  return this->getNombre() + "\nNotas:\n" + calificaciones->toStringNoObj();
+  }
+};
+class Profesor : public Usuario {
+private:
+ ListaDeObjetos<Estudiante> *clase;
+ std::string asignatura;
+public:
+ Profesor(){}
+ Profesor(std::string nombre, std::string apellido,std::string passwd, int id) : Usuario(nombre,apellido,passwd,id) {
+  clase = new ListaDeObjetos<Estudiante>();
+  asignatura = "";
+ }
+void setAsignatura(std::string asignatura){
+   this->asignatura = asignatura;
+}
+std::string getAsignatura(){
+   return asignatura;
+}
+void agregarEstudiante(Estudiante es) {
+        clase->append(es);
+    }
+
+    Estudiante getEstudiante(int pos) {
+        return clase->get(pos);
+    }
+
+    void eliminarEstudiante(int pos) {
+        clase->erase(pos);
+    }
+
+    std::string toString() {
+        return "Profesor: " + this->getNombre() + "\nClase: " + asignatura + "\nEstudiantes:\n" + clase->toString();
+    }
+};
+
+class Admin : public Usuario{
+public:
+    Admin(){}
+
+    Admin(std::string nombre, std::string apellido, std::string pwd, int id) : Usuario(nombre,apellido,pwd,id) {}
 
 };
