@@ -29,7 +29,7 @@ void darAlta(){
 std::string getNombre() {
   return nombre + " " + apellido;
 }
-std:.string getUsuario() {
+std::string getUsuario() {
   return nombre;
 }
 std::string getPwd() {
