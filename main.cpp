@@ -1,12 +1,13 @@
 #include <iostream>
 #include <string>
-using namespace std;
+
+// Prototipos de los menús
+void menuAdministrador();
+void menuProfesor();
+void menuEstudiante();
 
 // Función auxiliar para validar usuario y password y devolver código de rol
-int codigoRol(const string& nombre, const string& password) {
-    // Usuario: admin / admin123
-    // Usuario: profe / profe123
-    // Usuario: estudiante / estu123
+int codigoRol(const std::string& nombre, const std::string& password) {
     if (nombre == "admin" && password == "admin123")
         return 1;
     else if (nombre == "profe" && password == "profe123")
@@ -16,41 +17,54 @@ int codigoRol(const string& nombre, const string& password) {
     else
         return 0; // credenciales incorrectas
 }
-// Simulación de login y menú por rol usando switch
+
 int main() {
-    string nombre, password;
+    std::string nombre, password;
     int rolCode;
     bool acceso = false;
 
     do {
-        cout << "===== BIENVENIDO AL SISTEMA =====" << endl;
-        cout << "Ingrese su nombre de usuario: ";
-        getline(cin, nombre);
+        std::cout << "===== BIENVENIDO AL SISTEMA =====" << std::endl;
+        std::cout << "Ingrese su nombre de usuario: ";
+        std::getline(std::cin, nombre);
 
-        cout << "Ingrese su password: ";
-        getline(cin, password);
+        std::cout << "Ingrese su password: ";
+        std::getline(std::cin, password);
 
         rolCode = codigoRol(nombre, password);
 
         switch (rolCode) {
             case 1:
                 menuAdministrador();
-                acceso = true;
-                break;
+            acceso = true;
+            break;
             case 2:
                 menuProfesor();
-                acceso = true;
-                break;
+            acceso = true;
+            break;
             case 3:
                 menuEstudiante();
-                acceso = true;
-                break;
+            acceso = true;
+            break;
             default:
-                cout << "\n*** ERROR: Usuario o password incorrecto. Intente de nuevo. ***\n" << endl;
-                break;
+                std::cout << "\n*** ERROR: Usuario o password incorrecto. Intente de nuevo. ***\n" << std::endl;
+            break;
         }
     } while (!acceso);
 
-    // Aquí iría la lógica de selección de opciones y bucles (no solicitada)
     return 0;
+}
+
+// Ejemplo de definiciones vacías de menús
+void menuAdministrador() {
+    std::cout << "Bienvenido administrador." << std::endl;
+    // Aquí va el menú real
+}
+void menuProfesor() {
+    std::cout << "Bienvenido profesor." << std::endl;
+    // Aquí va el menú real
+}
+void menuEstudiante() {
+    std::cout << "Bienvenido estudiante." << std::endl;
+    // Aquí va el menú real
 }

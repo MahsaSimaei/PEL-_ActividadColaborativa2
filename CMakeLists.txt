@@ -3,4 +3,6 @@ project(PEL__ActividadColaborativa2)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(PEL__ActividadColaborativa2 main.cpp)
+add_executable(PEL__ActividadColaborativa2 main.cpp
+        Menus.h
+        DynamicArray.h)
