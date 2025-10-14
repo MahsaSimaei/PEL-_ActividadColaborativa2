@@ -1,160 +1,187 @@
+#ifndef MENU_H
+#define MENU_H
+
 #include <iostream>
 #include <string>
-#include "Recursos.h"
+#include <limits>
 #include "Usuario.h"
+#include "Recursos.h"
 using namespace std;
-//Listas de usuarios
-ListaDeObjetos<Estuadiante> estudiantes;
-ListaDeObjetos<Profesor> profesores;
-Admin admin("Admin","González", "xyz",3);
 
+// =============================================================
+// Estructuras globales de gestión
+// =============================================================
+ListaDeObjetos<Estudiante>* estudiantes = new ListaDeObjetos<Estudiante>();
+ListaDeObjetos<Profesor>* profesores = new ListaDeObjetos<Profesor>();
+Admin* admin = new Admin("Admin", "Gonzalez", "xyz", 1);
 
-// Menú de Profesor
-void menuProfesor() {
+// Contador automático de IDs
+int nextId = 2;
+
+// =============================================================
+// Funciones auxiliares
+// =============================================================
+int generarId() { return nextId++; }
+
+// =============================================================
+// Menú del Estudiante
+// =============================================================
+void menuEstudiante(Estudiante& est) {
     int opcion = -1;
-    //Mostrar menu de inicio
-    while (opcion != 0){
-        do{
-            
-    std::cout << "\n===== MENU PROFESOR =====" << std::endl;
-    std::cout << "1. Visualizar estudiantes" << std::endl;
-    std::cout << "2. Visualizar datos de la clase" << std::endl;
-    std::cout << "3. Calculadora avanzada" << std::endl;
-    std::cout << "4. Juego de adivinanza" << std::endl;
-    std::cout << "0. Cerrar sesion" << std::endl;
-    std::cout << "Opcion: ";
-    std::cin >> opcion;
-        }while(opcion < 0 || opcion > 4);
-    //Llamar a la función correspondiente de acuerdo a la elección del usuario
-        switch(opcion) {
-            case 1: //Visualizar estudiantes
-                break;
-            case 2: //Visualizar clase
-                break;
-            case 3: //Calculadora avanzada
-                inicioCalculadora();
-            break;
-            case 4: //Juego de Adivinanza 
-                juegoRecurso5();
-            break;
-            case 0: //Cerrar Sesión
-            std::cout << "Saliendo...." << std::endl;
-            break;
-        }
-    }        
-}
+    while (opcion != 0) {
+        cout << "\n===== MENU ESTUDIANTE =====\n"
+             << "1. Agregar archivo a mochila\n"
+             << "2. Ver mochila\n"
+             << "3. Eliminar archivo\n"
+             << "4. Calculadora avanzada\n"
+             << "5. Juego de adivinanza\n"
+             << "0. Cerrar sesion\nOpcion: ";
+        cin >> opcion;
 
-// Menú de Estudiante
-void menuEstudiante() {
-    int opcion = -1; //Inicializar en -1 para entrar en el bucle
-    //Mostrar menú de inicio
-    while(opcion!= 0){
-        do{
-            
-    std::cout << "\n===== MENU ESTUDIANTE =====" << std::endl;
-    std::cout << "1. Cargar fichero a la mochila" << std::endl;
-    std::cout << "2. Ver contenido de la mochila" << std::endl;
-    std::cout << "3. Calculadora avanzada" << std::endl;
-    std::cout << "4. Juego de adivinanza" << std::endl;
-    std::cout << "0. Cerrar sesion" << std::endl;
-    std::cout << "Opcion: ";
-    std::cin>> opcion; //Almacenar opcion
-        }while(opcion < 0 || opcion > 3);
-    //Llamar a función correspondiente de acuerdo a la elección del usuario
-        switch(opcion){
-            case 1: //Cargar fichero a la mochila
+        switch (opcion) {
+            case 1: {
+                string archivo;
+                cout << "Ingrese nombre del archivo: ";
+                cin >> archivo;
+                est.agregarArchivo(archivo);
+                cout << "Archivo agregado correctamente.\n";
                 break;
-            case 2: //Ver contenido de la mochila
-                break;
-            case 3://Calculadora avanzada
-                inicioCalculadora();
-            break;
-            case 4: //Juego de adivinanza
-                juegoRecurso5();
-            break;
-            case 0: //Cerrar sesión
-                std::cout << "Saliendo..." << std::endl;
-            break;
-        }
-    }          
-}
-
-// Menú de Administrador
-void menuAdministrador() {
-    int opcion = -1;
-    while(opcion != 0){
-        do{
-    std::cout << "\n===== MENU ADMINISTRADOR =====" << endl;
-    std::cout << "1. Dar de alta usuario" << endl;
-    std::cout << "2. Dar de baja usuario" << endl;
-    std::cout << "3. Gestionar datos de usuario" << endl;
-    std::cout << "4. Listar usuarios" << endl;
-    std::cout << "0. Cerrar sesion" << endl;
-    std::cout << "Opcion: ";
-    std::cin >> opcion;
-        }while(opcion < 0 || opcion > 3);
-    //Llamar a función correspondiente de acuerdo a la elección del usuario
-
-    switch(opcion){
-        case 1: { //Dar de alta usuario
-            //Pedir datos
-            std::string nombre, pass, apellido;
-            int id, tipo;
-            std::cout << "===== ALTA USUARIO: =====" << std::endl;
-            std::cout << " 1. Ingrese el nombre: " << std::endl;
-            std::cin >> nombre;
-            std::cout << " 2. Ingrese el apellido: "<< std::endl;
-            std::cin >> apellido;
-            std::cout << " 3. Ingrese la contraseña: " << std::endl;
-            std::cin >> pass;
-            std::cout << " 4. Ingrese el id: " << std::endl;
-            std::cin >> id;
-            std::cout << " 5. Ingrese el tipo de usuario: 1) Estudiante 2) Profesor " << std::endl;
-            std::cin >> tipo;
-            //Agregar usuario
-            if(tipo == 1) { //Estudiante
-                estudiantes.append(Estudiante(nombre,apellido,pass,id));
-                std::cout << "Estudiante dado de alta correctamente!" << std::ednl;
-            }else if(tipo == 2){ //Profesor
-                profesores.append(Profesor(nombre,apellido,pass,id));
-                std::cout << "Profesor dado de alta correctamente!" << std::endl;
-                    }
-            break;
-        }
-        case 2: { //Dar de baja usuario
-            int id, tipo;
-            std::cout << "==== BAJA USUARIO: ===="<< std::endl;
-            std::cout << " 1. Ingrese el tipo de usuario: 1) Estudiante 2) Profesor " << std::endl;
-            std::cin >> tipo;
-            std::cout << " 2. Ingrese el id del usuario: " << std::endl;
-            std::cin >> id;
-            if(tipo == 1) {
-                for(int i = 1; i <= estudiantes.getSize(); i++){
-                    if(estudiantes.get(i).getId() == id){
-                        estudiantes.erase(i);
-                        std::cout << "Estudiante dado de baja correctamente! " << std::endl;
-                        break; //Salir del bucle una vez encontrado
-                    }
-                }
-            }else if(tipo == 2){
-                for(int i = 1; i <= profesores.getSize(); i++){
-                    if(profesores.get(i).getId() == id){
-                        profesores.erase(i);
-                        std::cout << "Profesor dado de baja correctamente!" << std::endl;
-                        break;
-                    }
-                }
             }
-            break;
+            case 2:
+                cout << est.verMochila();
+                break;
+            case 3: {
+                int pos;
+                cout << "Posición a eliminar: ";
+                cin >> pos;
+                est.eliminarArchivo(pos);
+                cout << "Archivo eliminado.\n";
+                break;
+            }
+            case 4:
+                inicioCalculadora();
+                break;
+            case 5:
+                juegoRecurso5();
+                break;
+            case 0:
+                cout << "Cerrando sesión...\n";
+                break;
         }
-        case 3: //Gestionar datos de usuario
-        break;
-        case 4: //Listar usuarios
-        break;
-        case 0: //Salir
-        std::cout << "Saliendo...." << std::endl;
-        break;
     }
 }
+
+// =============================================================
+// Menú del Profesor
+// =============================================================
+void menuProfesor(Profesor& prof) {
+    int opcion = -1;
+    while (opcion != 0) {
+        cout << "\n===== MENU PROFESOR =====\n"
+             << "1. Ver estudiantes\n"
+             << "2. Agregar estudiante a clase\n"
+             << "3. Calculadora avanzada\n"
+             << "4. Juego de adivinanza\n"
+             << "0. Cerrar sesion\nOpcion: ";
+        cin >> opcion;
+
+        switch (opcion) {
+            case 1:
+                cout << prof.toString();
+                break;
+            case 2: {
+                string nombre, apellido, pass;
+                cout << "Nombre: "; cin >> nombre;
+                cout << "Apellido: "; cin >> apellido;
+                cout << "Password: "; cin >> pass;
+                Estudiante nuevo(nombre, apellido, pass, generarId());
+                prof.agregarEstudiante(nuevo);
+                cout << "Estudiante agregado a la clase.\n";
+                break;
+            }
+            case 3:
+                inicioCalculadora();
+                break;
+            case 4:
+                juegoRecurso5();
+                break;
+            case 0:
+                cout << "Cerrando sesión...\n";
+                break;
+        }
+    }
 }
 
+// =============================================================
+// Menú del Administrador
+// =============================================================
+void menuAdministrador() {
+    int opcion = -1;
+    while (opcion != 0) {
+        cout << "\n===== MENU ADMINISTRADOR =====\n"
+             << "1. Dar de alta usuario\n"
+             << "2. Dar de baja usuario\n"
+             << "3. Listar usuarios\n"
+             << "0. Salir\nOpcion: ";
+        cin >> opcion;
+
+        switch (opcion) {
+            case 1: {
+                string nombre, apellido, pass;
+                int tipo;
+                cout << "Nombre: "; cin >> nombre;
+                cout << "Apellido: "; cin >> apellido;
+                cout << "Password: "; cin >> pass;
+                cout << "Tipo (1=Estudiante, 2=Profesor): ";
+                cin >> tipo;
+
+                if (tipo == 1) {
+                    estudiantes->append(Estudiante(nombre, apellido, pass, generarId()));
+                    cout << "Estudiante dado de alta correctamente.\n";
+                } else {
+                    profesores->append(Profesor(nombre, apellido, pass, generarId()));
+                    cout << "Profesor dado de alta correctamente.\n";
+                }
+                break;
+            }
+
+            case 2: {
+                int tipo, id;
+                cout << "Tipo (1=Estudiante, 2=Profesor): ";
+                cin >> tipo;
+                cout << "ID a eliminar: ";
+                cin >> id;
+
+                if (tipo == 1) {
+                    for (int i = 1; i <= estudiantes->getSize(); i++) {
+                        if (estudiantes->get(i).getId() == id) {
+                            estudiantes->erase(i);
+                            cout << "Estudiante eliminado correctamente.\n";
+                            break;
+                        }
+                    }
+                } else {
+                    for (int i = 1; i <= profesores->getSize(); i++) {
+                        if (profesores->get(i).getId() == id) {
+                            profesores->erase(i);
+                            cout << "Profesor eliminado correctamente.\n";
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+
+            case 3:
+                cout << "=== Estudiantes ===\n" << estudiantes->toString();
+                cout << "\n=== Profesores ===\n" << profesores->toString();
+                break;
+
+            case 0:
+                cout << "Saliendo del sistema...\n";
+                break;
+        }
+    }
+}
+
+#endif
