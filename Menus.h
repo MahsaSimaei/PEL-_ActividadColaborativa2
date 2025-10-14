@@ -5,7 +5,6 @@
 #include <string>
 #include <limits>
 #include "Usuario.h"
-#include "Recursos.h"
 using namespace std;
 
 // =============================================================

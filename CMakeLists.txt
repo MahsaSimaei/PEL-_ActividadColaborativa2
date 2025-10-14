@@ -5,4 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(PEL__ActividadColaborativa2 main.cpp
         Menus.h
-        DynamicArray.h)
+        DynamicArray.h
+        MochilaDigital.h
+        Estudiante.h
+        Fichero.h)
