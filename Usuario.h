@@ -1,142 +1,138 @@
+#ifndef USUARIO_H
+#define USUARIO_H
+
 #include <iostream>
-#include <ostream>
-#include <random>
+#include <string>
+#include <vector>
 #include "Listas.h"
-class Usuario{
-private:
- std::string nombre;
- std::string apellido;
- std::string passwd;
- int id;
- bool alta;
+
+using namespace std;
+
+// =============================================================
+// Clase base: Usuario
+// =============================================================
+class Usuario {
+protected:
+    string nombre;
+    string apellido;
+    string passwd;
+    int id;
+    bool alta;
+
 public:
- Usuario() {
-  nombre = "";
-  passwd = "";
-  id = 0;
-  alta = false;
- }
-Usuario(std::string nombre, std::string apellido, std::string passwd, int id){
-  this ->nombre = nombre;
-  this ->apellido = apellido;
-  this ->passwd = passwd;
-  this ->id = id;
-  alta = false;
-}
-void darAlta(){
-  alta = true;
-}
-std::string getNombre() {
-  return nombre + " " + apellido;
-}
-std::string getUsuario() {
-  return nombre;
-}
-std::string getPasswd() {
-        return passwd;
-    }
+    Usuario() : nombre(""), apellido(""), passwd(""), id(0), alta(false) {}
 
-    bool isAlta() {
-        return alta;
-    }
+    Usuario(string nombre, string apellido, string passwd, int id)
+        : nombre(nombre), apellido(apellido), passwd(passwd), id(id), alta(true) {}
 
-    int getId() {
-        return id;
-    }
+    virtual ~Usuario() = default;
 
-    void setNombre(std::string nombre) {
-        this->nombre = nombre;
-    }
+    void darAlta() { alta = true; }
+    void darBaja() { alta = false; }
 
-    void setApellido(std::string apellido) {
-        this->apellido = apellido;
-    }
+    string getNombreCompleto() const { return nombre + " " + apellido; }
+    string getNombre() const { return nombre; }
+    string getPasswd() const { return passwd; }
+    int getId() const { return id; }
+    bool isAlta() const { return alta; }
 
-    std::string toString() {
-        std::string ret;
-        ret = "Nombre: " + nombre + " " + apellido + ", ID: " + std::to_string(id);
-        ret += alta ? ", Esta de alta." : ", Esta de baja";
-        return ret;
-    }
+    void setNombre(string n) { nombre = n; }
+    void setApellido(string a) { apellido = a; }
 
+    virtual string toString() const {
+        string estado = alta ? "Alta" : "Baja";
+        return "ID: " + to_string(id) + " | " + nombre + " " + apellido + " (" + estado + ")";
+    }
 };
+
+// =============================================================
+// Clase: Estudiante
+// =============================================================
 class Estudiante : public Usuario {
 private:
- ListaDeObjetos<FILE> *mochila;
- ListaDeObjetos<double> *calificaciones;
- std::string clase;
-public:
- Estudiante () { }
- Estudiante(std::string nombre, std::string apellido, std::string passwd, int id) : Usuario(nombre,apellido,passwd,id) {
-           mochila = new ListaDeObjetos<FILE> ();
-           calificaciones = new ListaDeObjetos<double>();
-           clase = "";
- }
-void setClase(std::string clase){
-    this->clase = clase;
-std::string getClase()  {
-    return clase;
-}
-void agregarCalificaciones(double nota) {
-    calificaciones->append(nota);
-}
-double getCalificacion(int pos) {
-    return calificaciones->get(pos);
-}
-void eliminarCalificacion(int pos) {
-    calificaciones->erase(pos);
-}
-void agregarDoc(FILE doc) {
-   mochila->append(doc);
-}
-FILE getDoc(int pos) {
-   calificaciones->get(pos);
-}
-void eliminarDoc(int pos) {
-   calificaciones->erase(pos);
-}
+    ListaDeObjetos<string>* mochila;         // Archivos digitales
+    ListaDeObjetos<double>* calificaciones;  // Notas
+    string clase;
 
-std::string toString() {
-  return this->getNombre() + "\nNotas:\n" + calificaciones->toStringNoObj();
-  }
+public:
+    Estudiante() : Usuario() {
+        mochila = new ListaDeObjetos<string>();
+        calificaciones = new ListaDeObjetos<double>();
+        clase = "";
+    }
+
+    Estudiante(string nombre, string apellido, string passwd, int id)
+        : Usuario(nombre, apellido, passwd, id) {
+        mochila = new ListaDeObjetos<string>();
+        calificaciones = new ListaDeObjetos<double>();
+        clase = "";
+    }
+
+    ~Estudiante() {
+        delete mochila;
+        delete calificaciones;
+    }
+
+    void setClase(string clase_) { clase = clase_; }
+    string getClase() const { return clase; }
+
+    void agregarArchivo(const string& archivo) { mochila->append(archivo); }
+    void eliminarArchivo(int pos) { mochila->erase(pos); }
+
+    string verMochila() const { return mochila->toStringNoObj(); }
+
+    void agregarCalificacion(double nota) { calificaciones->append(nota); }
+    double getCalificacion(int pos) const { return calificaciones->get(pos); }
+
+    string toString() const override {
+        return "Estudiante: " + getNombreCompleto() + "\nClase: " + clase +
+               "\nMochila:\n" + mochila->toStringNoObj() +
+               "\nCalificaciones:\n" + calificaciones->toStringNoObj();
+    }
 };
+
+// =============================================================
+// Clase: Profesor
+// =============================================================
 class Profesor : public Usuario {
 private:
- ListaDeObjetos<Estudiante> *clase;
- std::string asignatura;
+    ListaDeObjetos<Estudiante>* clase;
+    string asignatura;
+
 public:
- Profesor(){}
- Profesor(std::string nombre, std::string apellido,std::string passwd, int id) : Usuario(nombre,apellido,passwd,id) {
-  clase = new ListaDeObjetos<Estudiante>();
-  asignatura = "";
- }
-void setAsignatura(std::string asignatura){
-   this->asignatura = asignatura;
-}
-std::string getAsignatura(){
-   return asignatura;
-}
-void agregarEstudiante(Estudiante es) {
-        clase->append(es);
+    Profesor() : Usuario() {
+        clase = new ListaDeObjetos<Estudiante>();
+        asignatura = "";
     }
 
-    Estudiante getEstudiante(int pos) {
-        return clase->get(pos);
+    Profesor(string nombre, string apellido, string passwd, int id)
+        : Usuario(nombre, apellido, passwd, id) {
+        clase = new ListaDeObjetos<Estudiante>();
+        asignatura = "";
     }
 
-    void eliminarEstudiante(int pos) {
-        clase->erase(pos);
-    }
+    ~Profesor() { delete clase; }
 
-    std::string toString() {
-        return "Profesor: " + this->getNombre() + "\nClase: " + asignatura + "\nEstudiantes:\n" + clase->toString();
+    void setAsignatura(string a) { asignatura = a; }
+    string getAsignatura() const { return asignatura; }
+
+    void agregarEstudiante(const Estudiante& e) { clase->append(e); }
+    void eliminarEstudiante(int pos) { clase->erase(pos); }
+
+    string toString() const override {
+        return "Profesor: " + getNombreCompleto() +
+               "\nAsignatura: " + asignatura +
+               "\nEstudiantes:\n" + clase->toString();
     }
 };
 
-class Admin : public Usuario{
+// =============================================================
+// Clase: Admin
+// =============================================================
+class Admin : public Usuario {
 public:
-    Admin(){}
-
-    Admin(std::string nombre, std::string apellido, std::string pwd, int id) : Usuario(nombre,apellido,pwd,id) {}
-
+    Admin() : Usuario() {}
+    Admin(string n, string a, string p, int id) : Usuario(n, a, p, id) {}
 };
+
+#endif
