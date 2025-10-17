@@ -68,6 +68,7 @@ void menuAdministrador() {
 
 void menuProfesor() {
     std::cout << "Bienvenido profesor." << std::endl;
+
 }
 
 void menuEstudiante(Estudiante& est) {
