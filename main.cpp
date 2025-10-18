@@ -3,6 +3,7 @@
 #include "MochilaDigital.h"
 #include "Usuario.h"
 #include <limits>
+#include "JuegoAdivinaNumero.h"
 // Prototipos de los menús
 void menuAdministrador();
 void menuProfesor();
@@ -67,8 +68,30 @@ void menuAdministrador() {
 }
 
 void menuProfesor() {
-    std::cout << "Bienvenido profesor." << std::endl;
+    int opcion = -1;
+    while (opcion != 0) {
+        std::cout << "\n===== MENU PROFESOR =====\n"
+                  << "1. Jugar: Adivina el número\n"
+                  << "0. Cerrar sesión\nOpción: ";
+        if (!(std::cin >> opcion)) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Entrada no válida.\n";
+            continue;
+        }
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
+        switch (opcion) {
+            case 1:
+                jugarAdivinaNumero();
+            break;
+            case 0:
+                std::cout << "Cerrando sesión...\n";
+            break;
+            default:
+                std::cout << "Opción inválida.\n";
+        }
+    }
 }
 
 void menuEstudiante(Estudiante& est) {
@@ -76,17 +99,28 @@ void menuEstudiante(Estudiante& est) {
     while (opcion != 0) {
         std::cout << "\n===== MENU ESTUDIANTE =====\n"
                   << "1. Gestionar mochila digital\n"
+                  << "2. Jugar: Adivina el número\n"
                   << "0. Cerrar sesión\nOpción: ";
-        std::cin >> opcion;
-        std::cin.ignore();
+        if (!(std::cin >> opcion)) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Entrada no válida.\n";
+            continue;
+        }
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         switch (opcion) {
             case 1:
                 menuMochila(est.getMochila());
-                break;
+            break;
+            case 2:
+                jugarAdivinaNumero();
+            break;
             case 0:
                 std::cout << "Cerrando sesión...\n";
-                break;
+            break;
+            default:
+                std::cout << "Opción inválida.\n";
         }
     }
 }
