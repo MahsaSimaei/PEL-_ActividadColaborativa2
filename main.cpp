@@ -27,10 +27,17 @@ int main() {
     std::string nombre, password;
     int rolCode;
     bool acceso = false;
-
+    int opcion;
     do {
         std::cout << "===== BIENVENIDO AL SISTEMA =====" << std::endl;
-        std::cout << "Ingrese su nombre de usuario: ";
+        std::cout << "- - - - - - - - - - - - - - - - -"<< std::endl;
+        std::cout<< "       1.Estudiante " << std::endl;
+        std::cout<< "       2. Profesor(a) " << std::endl;
+        std::cout<< "       3. Administrador " << std::endl;
+        std::cout << "Por favor, selecciona tu tipo de usuario:  " <<std::endl;
+
+        std::cin >> opcion;
+            
         std::getline(std::cin, nombre);
 
         std::cout << "Ingrese su password: ";
