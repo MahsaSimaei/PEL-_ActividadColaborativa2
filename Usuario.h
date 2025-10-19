@@ -6,16 +6,16 @@ using std::string;
 
 class Usuario {
 protected:
-    string nombre;
-    string apellido;
-    string passwd;
+    std::string nombre;
+    std::string apellido;
+    std::string passwd;
     int id;
     bool alta;
 
 public:
     Usuario() : nombre(""), apellido(""), passwd(""), id(0), alta(false) {}
 
-    Usuario(string nombre, string apellido, string passwd, int id)
+    Usuario(std::string nombre, std::string apellido, std::string passwd, int id)
         : nombre(nombre), apellido(apellido), passwd(passwd), id(id), alta(true) {}
 
     ~Usuario() = default;
@@ -23,17 +23,17 @@ public:
     void darAlta() { alta = true; }
     void darBaja() { alta = false; }
 
-    string getNombreCompleto() const { return nombre + " " + apellido; }
-    string getNombre() const { return nombre; }
-    string getPasswd() const { return passwd; }
+    std::string getNombreCompleto() const { return nombre + " " + apellido; }
+    std::string getNombre() const { return nombre; }
+    std::string getPasswd() const { return passwd; }
     int getId() const { return id; }
     bool isAlta() const { return alta; }
 
-    void setNombre(string n) { nombre = n; }
-    void setApellido(string a) { apellido = a; }
+    void setNombre(std::string n) { nombre = n; }
+    void setApellido(std::string a) { apellido = a; }
 
-    string toString() const {
-        string estado = alta ? "Alta" : "Baja";
+    std::string toString() const {
+        std::string estado = alta ? "Alta" : "Baja";
         return "ID: " + std::to_string(id) + " | " + nombre + " " + apellido + " (" + estado + ")";
     }
 };
