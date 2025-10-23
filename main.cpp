@@ -2,7 +2,7 @@
 #include <string>
 #include "MochilaDigital.h"
 #include "Usuario.h"
-#include <limits>
+#include "Listas.h";
 #include "JuegoAdivinaNumero.h"
 // Prototipos de los menús
 void menuAdministrador();
