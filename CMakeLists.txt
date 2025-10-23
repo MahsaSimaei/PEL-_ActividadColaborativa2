@@ -8,4 +8,6 @@ add_executable(PEL__ActividadColaborativa2 main.cpp
         DynamicArray.h
         MochilaDigital.h
         Fichero.h
-        JuegoAdivinaNumero.h)
+        JuegoAdivinaNumero.h
+        Listas.h
+        Calculadora.h)
