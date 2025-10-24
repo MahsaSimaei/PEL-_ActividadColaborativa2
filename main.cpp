@@ -2,8 +2,9 @@
 #include <string>
 #include "MochilaDigital.h"
 #include "Usuario.h"
-#include "Listas.h";
+#include "Listas.h"
 #include "JuegoAdivinaNumero.h"
+
 // Prototipos de los menús
 void menuAdministrador();
 void menuProfesor();
@@ -31,13 +32,15 @@ int main() {
     do {
         std::cout << "===== BIENVENIDO AL SISTEMA =====" << std::endl;
         std::cout << "- - - - - - - - - - - - - - - - -"<< std::endl;
-        std::cout<< "       1.Estudiante " << std::endl;
-        std::cout<< "       2. Profesor(a) " << std::endl;
-        std::cout<< "       3. Administrador " << std::endl;
-        std::cout << "Por favor, selecciona tu tipo de usuario:  " <<std::endl;
+        std::cout << "       1. Estudiante " << std::endl;
+        std::cout << "       2. Profesor(a) " << std::endl;
+        std::cout << "       3. Administrador " << std::endl;
+        std::cout << "Por favor, selecciona tu tipo de usuario:  " << std::endl;
 
         std::cin >> opcion;
-            
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // CORREGIDO: limpia el buffer
+
+        std::cout << "Ingrese su nombre: ";
         std::getline(std::cin, nombre);
 
         std::cout << "Ingrese su password: ";
@@ -91,10 +94,10 @@ void menuProfesor() {
         switch (opcion) {
             case 1:
                 jugarAdivinaNumero();
-            break;
+                break;
             case 0:
                 std::cout << "Cerrando sesión...\n";
-            break;
+                break;
             default:
                 std::cout << "Opción inválida.\n";
         }
@@ -119,18 +122,19 @@ void menuEstudiante(Estudiante& est) {
         switch (opcion) {
             case 1:
                 menuMochila(est.getMochila());
-            break;
+                break;
             case 2:
                 jugarAdivinaNumero();
-            break;
+                break;
             case 0:
                 std::cout << "Cerrando sesión...\n";
-            break;
+                break;
             default:
                 std::cout << "Opción inválida.\n";
         }
     }
 }
+
 void menuMochila(MochilaDigital* mochila) {
     int opcion;
     do {
@@ -163,7 +167,7 @@ void menuMochila(MochilaDigital* mochila) {
                     break;
                 }
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                mochila->eliminarDocumento(pos - 1);
+                mochila->eliminarDocumento(pos);
                 break;
             }
             case 3:
@@ -179,7 +183,7 @@ void menuMochila(MochilaDigital* mochila) {
                     break;
                 }
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                mochila->verContenidoDocumento(pos - 1);
+                mochila->verContenidoDocumento(pos);
                 break;
             }
             case 5: {
@@ -192,7 +196,7 @@ void menuMochila(MochilaDigital* mochila) {
                     break;
                 }
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                mochila->editarContenidoDocumento(pos - 1);
+                mochila->editarContenidoDocumento(pos);
                 break;
             }
             case 0:

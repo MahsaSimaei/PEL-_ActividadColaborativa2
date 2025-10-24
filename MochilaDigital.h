@@ -5,14 +5,14 @@
 #include <string>
 #include <fstream>
 #include <filesystem>
-#include "DynamicArray.h"
+#include "Listas.h"
 #include "Fichero.h"
 
 namespace fs = std::filesystem;
 
 class MochilaDigital {
 private:
-    DynamicArray<Fichero> documentos;
+    ListaDeObjetos<Fichero> documentos;
     std::string carpeta; // Carpeta asociada a la mochila
 
     // Auxiliar para asegurar extensión .txt
@@ -27,8 +27,8 @@ private:
 
     // Chequear si existe el documento con esa ruta completa
     bool existeDocumento(const std::string& rutaCompleta) const {
-        for (size_t i = 0; i < documentos.getSize(); ++i) {
-            if (documentos[i].getNombre() == rutaCompleta) {
+        for (int i = 1; i <= documentos.getSize(); ++i) {
+            if (documentos.get(i).getNombre() == rutaCompleta) {
                 return true;
             }
         }
@@ -36,7 +36,6 @@ private:
     }
 
 public:
-    // Constructor que recibe la carpeta de la mochila
     MochilaDigital(const std::string& carpetaMochila) : carpeta(carpetaMochila) {
         if (!fs::exists(carpeta))
             fs::create_directory(carpeta);
@@ -51,7 +50,7 @@ public:
                 std::string nombreArchivo = entry.path().filename().string();
                 std::string rutaCompleta = carpeta + "/" + nombreArchivo;
                 if (!existeDocumento(rutaCompleta)) {
-                    documentos.add(Fichero(rutaCompleta));
+                    documentos.append(Fichero(rutaCompleta));
                 }
             }
         }
@@ -70,20 +69,21 @@ public:
         if (doc.getContenido() == "[No se pudo crear el archivo]") {
             std::cout << "No se pudo crear el archivo '" << nombreConTxt << "'.\n";
         } else {
-            documentos.add(doc);
+            documentos.append(doc);
             std::cout << "Documento '" << nombreConTxt << "' agregado a la mochila.\n";
         }
     }
 
     void eliminarDocumento(int pos) {
-        if (pos < 0 || pos >= (int)documentos.getSize()) {
+        // pos es base 1 para ListaDeObjetos
+        if (pos < 1 || pos > documentos.getSize()) {
             std::cout << "Posición inválida.\n";
             return;
         }
-        std::string rutaCompleta = documentos[pos].getNombre();
+        std::string rutaCompleta = documentos.get(pos).getNombre();
         std::cout << "Eliminando '" << fs::path(rutaCompleta).filename().string() << "' de la mochila...\n";
         fs::remove(rutaCompleta); // Borra el archivo físico
-        documentos.removeAt(pos);
+        documentos.erase(pos);
     }
 
     void verDocumentos() const {
@@ -92,44 +92,43 @@ public:
             return;
         }
         std::cout << "Documentos en la mochila:\n";
-        for (size_t i = 0; i < documentos.getSize(); ++i) {
-            // Muestra solo el nombre del archivo, no la ruta completa
-            std::cout << i + 1 << ". " << fs::path(documentos[i].getNombre()).filename().string() << "\n";
+        for (int i = 1; i <= documentos.getSize(); ++i) {
+            std::cout << i << ". " << fs::path(documentos.get(i).getNombre()).filename().string() << "\n";
         }
     }
 
     void verContenidoDocumento(int pos) const {
-        if (pos < 0 || pos >= (int)documentos.getSize()) {
+        if (pos < 1 || pos > documentos.getSize()) {
             std::cout << "Posición inválida.\n";
             return;
         }
-        std::cout << "Contenido de '" << fs::path(documentos[pos].getNombre()).filename().string() << "':\n";
-        std::cout << documentos[pos].getContenido() << "\n";
+        std::cout << "Contenido de '" << fs::path(documentos.get(pos).getNombre()).filename().string() << "':\n";
+        std::cout << documentos.get(pos).getContenido() << "\n";
         std::cout << "---------------------------\n";
     }
 
     void editarContenidoDocumento(int pos) {
-        if (pos < 0 || pos >= (int)documentos.getSize()) {
+        if (pos < 1 || pos > documentos.getSize()) {
             std::cout << "Posición inválida.\n";
             return;
         }
-        std::cout << "Contenido actual de '" << fs::path(documentos[pos].getNombre()).filename().string() << "':\n";
-        std::cout << documentos[pos].getContenido() << "\n";
+        std::cout << "Contenido actual de '" << fs::path(documentos.get(pos).getNombre()).filename().string() << "':\n";
+        std::cout << documentos.get(pos).getContenido() << "\n";
         std::cout << "Ingrese el nuevo contenido (escriba la línea y pulse ENTER):\n";
         std::string nuevoContenido;
         std::getline(std::cin, nuevoContenido);
 
-        std::string rutaCompleta = documentos[pos].getNombre();
+        std::string rutaCompleta = documentos.get(pos).getNombre();
         std::ofstream archivo(rutaCompleta);
         if (archivo) {
             archivo << nuevoContenido << std::endl;
             archivo.close();
             std::cout << "Archivo actualizado correctamente.\n";
-            documentos[pos].setContenido(nuevoContenido + "\n");
+            documentos.get(pos).setContenido(nuevoContenido + "\n");
         } else {
             std::cout << "No se pudo abrir el archivo para editar.\n";
         }
     }
 };
 
-#endif //MOCHILADIGITAL_H
+#endif // MOCHILADIGITAL_H

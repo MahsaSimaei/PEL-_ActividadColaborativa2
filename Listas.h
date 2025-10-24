@@ -1,15 +1,13 @@
-
 #ifndef PEL__ACTIVIDADCOLABORATIVA2_LISTAS_H
 #define PEL__ACTIVIDADCOLABORATIVA2_LISTAS_H
 
-#endif //PEL__ACTIVIDADCOLABORATIVA2_LISTAS_H
+#include <iostream>
+#include <string>
 
-#ifndef LISTAS_H
-#define LISTAS_H
-
-template<typename T> class ListaDeObjetos {
+template<typename T>
+class ListaDeObjetos {
 private:
-    T *lista;
+    T* lista;
     size_t size;
     size_t last;
 public:
@@ -19,66 +17,68 @@ public:
         lista = new T[size];
     }
 
-    void append(T valor) {
-        lista[last] = valor;
-        last++;
+    ~ListaDeObjetos() {
+        delete[] lista;
+    }
+
+    void append(const T& valor) {
         if (last == size) {
             size *= 2;
-            T *aux = new T[size];
-            for (int i = 0; i < last; i++)
+            T* aux = new T[size];
+            for (size_t i = 0; i < last; i++)
                 aux[i] = lista[i];
             delete[] lista;
             lista = aux;
         }
+        lista[last] = valor;
+        last++;
     }
 
-    T get(int pos) {
-        T ret;
-        if (pos > 0 && pos < last)
-            ret = lista[pos-1];
+    T get(int pos) const {
+        T ret{};
+        if (pos > 0 && pos <= (int)last)
+            ret = lista[pos - 1];
         return ret;
     }
 
     void erase(int pos) {
-        if(pos == 1)
-            this->pop();
-        else if (pos < last && pos >= 0) {
-            last--;
-            for(int i = pos; i < last; i++) {
-                lista[i] = lista[i + 1];
-            }
-        }
-        else
+        if (pos <= 0 || pos > (int)last) {
             std::cout << "La posicion indicada es invalida" << std::endl;
+            return;
+        }
+        last--;
+        for (int i = pos - 1; i < (int)last; i++) {
+            lista[i] = lista[i + 1];
+        }
     }
 
     T pop() {
-        if (last == 0)
+        if (last == 0) {
             std::cout << "La lista esta vacia" << std::endl;
-        else
-            last--;
+            return T{};
+        }
+        last--;
         return lista[last];
     }
 
-    int getSize() {
-        return last; //*******************************
+    int getSize() const {
+        return (int)last;
     }
 
-    std::string toString() {
+    std::string toString() const {
         std::string ret;
-        for(int i = 0; i < last; i++) {
-            ret += std::to_string(i+1) + "." + lista[i].toString() + "\n";
+        for (size_t i = 0; i < last; i++) {
+            ret += std::to_string(i + 1) + ". " + lista[i].toString() + "\n";
         }
         return ret;
     }
 
-    std::string toStringNoObj() {
+    std::string toStringNoObj() const {
         std::string ret;
-        for(int i = 0; i < last; i++)
-            ret += std::to_string(i+1) + ". " + std::to_string(lista[i]) + "\n";
+        for (size_t i = 0; i < last; i++)
+            ret += std::to_string(i + 1) + ". " + std::to_string(lista[i]) + "\n";
         return ret;
     }
 };
 
-#endif //LISTAS_H
-
+#endif //PEL__ACTIVIDADCOLABORATIVA2_LISTAS_H
