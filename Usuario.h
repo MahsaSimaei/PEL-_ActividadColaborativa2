@@ -1,6 +1,6 @@
 #ifndef USUARIO_H
 #define USUARIO_H
-#include "MochilaDigital.h"
+#include "RecursosMochila.h"
 #include <string>
 using std::string;
 
@@ -18,7 +18,7 @@ public:
     Usuario(string nombre, string apellido, string passwd, int id)
         : nombre(nombre), apellido(apellido), passwd(passwd), id(id), alta(true) {}
 
-    virtual ~Usuario() = default;
+    ~Usuario() = default;
 
     void darAlta() { alta = true; }
     void darBaja() { alta = false; }
@@ -32,7 +32,8 @@ public:
     void setNombre(string n) { nombre = n; }
     void setApellido(string a) { apellido = a; }
 
-    virtual string toString() const {
+    // Ya no es virtual
+    string toString() const {
         string estado = alta ? "Alta" : "Baja";
         return "ID: " + std::to_string(id) + " | " + nombre + " " + apellido + " (" + estado + ")";
     }
@@ -61,4 +62,4 @@ public:
     MochilaDigital* getMochila() const { return mochila; }
 };
 
-#endif
+#endif // USUARIO_H

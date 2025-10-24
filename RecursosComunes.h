@@ -1,22 +1,75 @@
-//
-// Created by athin on 23/10/2025.
-//
+#ifndef RECURSOS_COMUNES_H
+#define RECURSOS_COMUNES_H
 
-#ifndef PEL__ACTIVIDADCOLABORATIVA2_CALCULADORA_H
-#define PEL__ACTIVIDADCOLABORATIVA2_CALCULADORA_H
-void suma(int x, int y) {
+#include <iostream>
+#include <random>
+#include <limits>
+#include <cmath>
+
+// ==================== Juego "Adivina el número" ====================
+class JuegoAdivinaNumero {
+private:
+    int numero_secreto;
+    int intentos;
+public:
+    JuegoAdivinaNumero() {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(1, 100);
+        numero_secreto = dis(gen);
+        intentos = 0;
+    }
+
+    void jugar() {
+        int adivinanza;
+        bool adivinado = false;
+        while (!adivinado) {
+            std::cout << "Introduce tu adivinanza (1-100): ";
+            if (!(std::cin >> adivinanza)) {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "Entrada no válida. Por favor, introduce un número (1-100).\n";
+                continue;
+            }
+            intentos++;
+            int diferencia = std::abs(adivinanza - numero_secreto);
+            if (adivinanza < numero_secreto) {
+                if (diferencia > 10)
+                    std::cout << "Demasiado bajo. ¡Intentalo de nuevo!\n";
+                else
+                    std::cout << "Bajo. ¡Intentalo de nuevo!\n";
+            } else if (adivinanza > numero_secreto) {
+                if (diferencia > 10)
+                    std::cout << "Demasiado alto. ¡Intentalo de nuevo!\n";
+                else
+                    std::cout << "Alto. ¡Intentalo de nuevo!\n";
+            } else {
+                std::cout << "¡Felicidades! Adivinaste el número en " << intentos << " intentos!\n";
+                adivinado = true;
+            }
+        }
+    }
+};
+
+inline void jugarAdivinaNumero() {
+    JuegoAdivinaNumero juego;
+    juego.jugar();
+}
+
+// ==================== Calculadora Avanzada ====================
+inline void suma(int x, int y) {
     std::cout << x << " + " << y << " = " << (x + y) << std::endl;
 }
 
-void resta(int x, int y) {
+inline void resta(int x, int y) {
     std::cout << x << " - " << y << " = " << (x - y) << std::endl;
 }
 
-void multiplicacion(int x, int y) {
+inline void multiplicacion(int x, int y) {
     std::cout << x << " x " << y << " = " << (x * y) << std::endl;
 }
 
-void division(int x, int y) {
+inline void division(int x, int y) {
     if (y != 0) {
         std::cout << x << " / " << y << " = " << (x / y) << std::endl;
     } else {
@@ -24,50 +77,40 @@ void division(int x, int y) {
     }
 }
 
-// -- Funciones de matrices (usando punteros dobles)
-void sumaMat(int** a, int** b, int** resultado, int n) {
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
+inline void sumaMat(int** a, int** b, int** resultado, int n) {
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
             resultado[i][j] = a[i][j] + b[i][j];
-        }
-    }
 }
 
-void restaMat(int** a, int** b, int** resultado, int n) {
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
+inline void restaMat(int** a, int** b, int** resultado, int n) {
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
             resultado[i][j] = a[i][j] - b[i][j];
-        }
-    }
 }
 
-void multiplicacionMat(int** a, int** b, int** resultado, int n) {
-    for (int i = 0; i < n; ++i) {
+inline void multiplicacionMat(int** a, int** b, int** resultado, int n) {
+    for (int i = 0; i < n; ++i)
         for (int j = 0; j < n; ++j) {
-            resultado[i][j] = 0; // Inicializa el elemento en 0
-            for (int k = 0; k < n; ++k) {
+            resultado[i][j] = 0;
+            for (int k = 0; k < n; ++k)
                 resultado[i][j] += a[i][k] * b[k][j];
-            }
         }
-    }
 }
 
-void imprimirMatriz(int** matriz, int n) {
+inline void imprimirMatriz(int** matriz, int n) {
     for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
+        for (int j = 0; j < n; ++j)
             std::cout << matriz[i][j] << " ";
-        }
         std::cout << std::endl;
     }
 }
 
-// Función inicial de calculadora
-void inicioCalculadora() {
-    int opcion1, opcion2, num1, num2, n;
-    // Crear matrices dinámicamente
-    int** matrizA;
-    int** matrizB;
-    int** resultado;
+inline void inicioCalculadora() {
+    int opcion1 = -1, opcion2 = -1, num1, num2, n;
+    int** matrizA = nullptr;
+    int** matrizB = nullptr;
+    int** resultado = nullptr;
 
     while (opcion1 != 0) {
         std::cout << " *******   C A L C U L A D O R A  ******* " << std::endl;
@@ -79,6 +122,7 @@ void inicioCalculadora() {
         std::cin >> opcion1;
 
         if (opcion1 == 1 || opcion1 == 2) {
+            opcion2 = -1;
             while (opcion2 != 0) {
                 if (opcion1 == 1) {
                     std::cout << " *******   C A L C U L A D O R A  ******* " << std::endl;
@@ -96,8 +140,6 @@ void inicioCalculadora() {
                     std::cout << " *******   C A L C U L A D O R A  ******* " << std::endl;
                     std::cout << " ---------------------------------------- " << std::endl;
                     std::cout << "          Operaciones con matrices: " << std::endl;
-
-                    // Llenar matrices
                     std::cout << " ---------------------------------------- " << std::endl;
                     std::cout << "Ingrese el tamaño (n) de la matriz (n x n): " << std::endl;
                     std::cin >> n;
@@ -112,29 +154,21 @@ void inicioCalculadora() {
                         resultado[i] = new int[n];
                     }
 
-                    // Ingresar valores para la primera matriz
                     std::cout << "Ingrese los elementos de la primera matriz:" << std::endl;
-                    for (int i = 0; i < n; ++i) {
-                        for (int j = 0; j < n; ++j) {
+                    for (int i = 0; i < n; ++i)
+                        for (int j = 0; j < n; ++j)
                             std::cin >> matrizA[i][j];
-                        }
-                    }
 
-                    // Ingresar valores para la segunda matriz
                     std::cout << "Ingrese los elementos de la segunda matriz:" << std::endl;
-                    for (int i = 0; i < n; ++i) {
-                        for (int j = 0; j < n; ++j) {
+                    for (int i = 0; i < n; ++i)
+                        for (int j = 0; j < n; ++j)
                             std::cin >> matrizB[i][j];
-                        }
-                    }
 
-                    // Imprimir datos
                     std::cout << "Matriz A:" << std::endl;
                     imprimirMatriz(matrizA, n);
                     std::cout << "Matriz B:" << std::endl;
                     imprimirMatriz(matrizB, n);
 
-                    // Seleccionar opción
                     std::cout << " ---------------------------------------- " << std::endl;
                     std::cout << "       Seleccione una operación:  " << std::endl;
                     std::cout << "          5. + Suma " << std::endl;
@@ -146,60 +180,68 @@ void inicioCalculadora() {
                 }
 
                 switch (opcion2) {
-                    // Operaciones básicas
-                    case 1: // Suma
+                    case 1:
                         std::cout << "Ingrese el primer número: " << std::endl;
                         std::cin >> num1;
                         std::cout << "Ingrese el segundo número: " << std::endl;
                         std::cin >> num2;
-                        suma(num1, num2); // Llamar función
-                    break;
-                    case 2: // Resta
+                        suma(num1, num2);
+                        break;
+                    case 2:
                         std::cout << "Ingrese el primer número: " << std::endl;
                         std::cin >> num1;
                         std::cout << "Ingrese el segundo número: " << std::endl;
                         std::cin >> num2;
-                        resta(num1, num2);// Llamar función
-                    break;
-                    case 3: // Multiplicación
+                        resta(num1, num2);
+                        break;
+                    case 3:
                         std::cout << "Ingrese el primer número: " << std::endl;
                         std::cin >> num1;
                         std::cout << "Ingrese el segundo número: " << std::endl;
                         std::cin >> num2;
-                        multiplicacion(num1, num2); // Llamar función
-                    break;
-                    case 4: // Division
+                        multiplicacion(num1, num2);
+                        break;
+                    case 4:
                         std::cout << "Ingrese el primer número: " << std::endl;
                         std::cin >> num1;
                         std::cout << "Ingrese el segundo número: " << std::endl;
                         std::cin >> num2;
-                        division(num1, num2); // Llamar función
-                    break;
-
-                    // Operaciones con matrices
-                    case 5: // Suma de matrices
+                        division(num1, num2);
+                        break;
+                    case 5:
                         sumaMat(matrizA, matrizB, resultado, n);
                         std::cout << "Resultado de la suma:" << std::endl;
                         imprimirMatriz(resultado, n);
-                        opcion2 = 0; // Regresar a menú de operaciones
+                        opcion2 = 0;
                         break;
-                    case 6: // Resta de matrices
+                    case 6:
                         restaMat(matrizA, matrizB, resultado, n);
                         std::cout << "Resultado de la resta:" << std::endl;
                         imprimirMatriz(resultado, n);
-                        opcion2 = 0; // Regresar a menú de operaciones
-                    break;
-                    case 7: // Multiplicación de matrices
+                        opcion2 = 0;
+                        break;
+                    case 7:
                         multiplicacionMat(matrizA, matrizB, resultado, n);
                         std::cout << "Resultado de la multiplicación:" << std::endl;
                         imprimirMatriz(resultado, n);
-                        opcion2 = 0; // Regresar a menú de operaciones
-                    break;
-                    break;
+                        opcion2 = 0;
+                        break;
                 }
             }
+        }
+        // Liberación de memoria para matrices dinámicas
+        if (matrizA != nullptr) {
+            for (int i = 0; i < n; ++i) {
+                delete[] matrizA[i];
+                delete[] matrizB[i];
+                delete[] resultado[i];
+            }
+            delete[] matrizA;
+            delete[] matrizB;
+            delete[] resultado;
+            matrizA = matrizB = resultado = nullptr;
         }
     }
 }
 
-#endif //PEL__ACTIVIDADCOLABORATIVA2_CALCULADORA_H
+#endif // RECURSOS_COMUNES_H

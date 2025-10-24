@@ -1,13 +1,45 @@
-#ifndef MOCHILADIGITAL_H
-#define MOCHILADIGITAL_H
+#ifndef RECURSOS_MOCHILA_H
+#define RECURSOS_MOCHILA_H
 
 #include <iostream>
 #include <string>
 #include <fstream>
 #include <filesystem>
+#include <sstream>
 #include "Listas.h"
-#include "Fichero.h"
+// ============ Fichero ==============
+class Fichero {
+private:
+    std::string nombre;
+    std::string contenido;
+public:
+    Fichero() : nombre(""), contenido("") {}
 
+    Fichero(const std::string& nombreArchivo) : nombre(nombreArchivo), contenido("") {
+        std::ifstream file(nombreArchivo);
+        if (file) {
+            std::stringstream buffer;
+            buffer << file.rdbuf();
+            contenido = buffer.str();
+        } else {
+            // Si no existe, lo crea vacío
+            std::ofstream nuevoArchivo(nombreArchivo);
+            if (nuevoArchivo) {
+                contenido = "";
+            } else {
+                contenido = "[No se pudo crear el archivo]";
+            }
+        }
+    }
+
+    std::string getNombre() const { return nombre; }
+    std::string getContenido() const { return contenido; }
+    void setContenido(const std::string& nuevoContenido) {
+        contenido = nuevoContenido;
+    }
+};
+
+// ============ MochilaDigital ==============
 namespace fs = std::filesystem;
 
 class MochilaDigital {
@@ -15,7 +47,6 @@ private:
     ListaDeObjetos<Fichero> documentos;
     std::string carpeta; // Carpeta asociada a la mochila
 
-    // Auxiliar para asegurar extensión .txt
     std::string asegurarExtensionTxt(const std::string& nombreArchivo) const {
         if (nombreArchivo.size() >= 4 &&
             nombreArchivo.substr(nombreArchivo.size() - 4) == ".txt") {
@@ -25,7 +56,6 @@ private:
         }
     }
 
-    // Chequear si existe el documento con esa ruta completa
     bool existeDocumento(const std::string& rutaCompleta) const {
         for (int i = 1; i <= documentos.getSize(); ++i) {
             if (documentos.get(i).getNombre() == rutaCompleta) {
@@ -43,7 +73,6 @@ public:
     }
     ~MochilaDigital() = default;
 
-    // Cargar todos los .txt existentes al empezar
     void cargarArchivosDeCarpeta() {
         for (const auto& entry : fs::directory_iterator(carpeta)) {
             if (entry.is_regular_file() && entry.path().extension() == ".txt") {
@@ -75,14 +104,13 @@ public:
     }
 
     void eliminarDocumento(int pos) {
-        // pos es base 1 para ListaDeObjetos
         if (pos < 1 || pos > documentos.getSize()) {
             std::cout << "Posición inválida.\n";
             return;
         }
         std::string rutaCompleta = documentos.get(pos).getNombre();
         std::cout << "Eliminando '" << fs::path(rutaCompleta).filename().string() << "' de la mochila...\n";
-        fs::remove(rutaCompleta); // Borra el archivo físico
+        fs::remove(rutaCompleta);
         documentos.erase(pos);
     }
 
@@ -131,4 +159,5 @@ public:
     }
 };
 
-#endif // MOCHILADIGITAL_H
+#endif // RECURSOS_MOCHILA_H
+

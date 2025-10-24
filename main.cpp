@@ -1,9 +1,9 @@
 #include <iostream>
 #include <string>
-#include "MochilaDigital.h"
 #include "Usuario.h"
 #include "Listas.h"
-#include "JuegoAdivinaNumero.h"
+#include "RecursosComunes.h"
+#include "RecursosMochila.h"
 
 // Prototipos de los menús
 void menuAdministrador();
@@ -38,7 +38,7 @@ int main() {
         std::cout << "Por favor, selecciona tu tipo de usuario:  " << std::endl;
 
         std::cin >> opcion;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // CORREGIDO: limpia el buffer
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // limpia el buffer
 
         std::cout << "Ingrese su nombre: ";
         std::getline(std::cin, nombre);

@@ -5,9 +5,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(PEL__ActividadColaborativa2 main.cpp
         Menus.h
-        MochilaDigital.h
-        Fichero.h
-        JuegoAdivinaNumero.h
         Listas.h
-        Calculadora.h
-        Fichero.h)
+        RecursosComunes.h
+        RecursosMochila.h)
