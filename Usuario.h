@@ -18,6 +18,7 @@ public:
     Usuario(string nombre, string apellido, string passwd, int id)
         : nombre(nombre), apellido(apellido), passwd(passwd), id(id), alta(true) {}
 
+    virtual ~Usuario() = default;
 
     void darAlta() { alta = true; }
     void darBaja() { alta = false; }
@@ -31,7 +32,7 @@ public:
     void setNombre(string n) { nombre = n; }
     void setApellido(string a) { apellido = a; }
 
-     std::string toString() const {
+    virtual string toString() const {
         string estado = alta ? "Alta" : "Baja";
         return "ID: " + std::to_string(id) + " | " + nombre + " " + apellido + " (" + estado + ")";
     }
