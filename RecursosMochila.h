@@ -7,7 +7,7 @@
 #include <filesystem>
 #include <sstream>
 #include "Listas.h"
-// ============ Fichero ==============
+
 class Fichero {
 private:
     std::string nombre;
@@ -16,20 +16,7 @@ public:
     Fichero() : nombre(""), contenido("") {}
 
     Fichero(const std::string& nombreArchivo) : nombre(nombreArchivo), contenido("") {
-        std::ifstream file(nombreArchivo);
-        if (file) {
-            std::stringstream buffer;
-            buffer << file.rdbuf();
-            contenido = buffer.str();
-        } else {
-            // Si no existe, lo crea vacío
-            std::ofstream nuevoArchivo(nombreArchivo);
-            if (nuevoArchivo) {
-                contenido = "";
-            } else {
-                contenido = "[No se pudo crear el archivo]";
-            }
-        }
+        recargarContenido();
     }
 
     std::string getNombre() const { return nombre; }
@@ -37,15 +24,25 @@ public:
     void setContenido(const std::string& nuevoContenido) {
         contenido = nuevoContenido;
     }
+
+    void recargarContenido() {
+        std::ifstream file(nombre);
+        if (file) {
+            std::stringstream buffer;
+            buffer << file.rdbuf();
+            contenido = buffer.str();
+        } else {
+            contenido = "";
+        }
+    }
 };
 
-// ============ MochilaDigital ==============
 namespace fs = std::filesystem;
 
 class MochilaDigital {
 private:
     ListaDeObjetos<Fichero> documentos;
-    std::string carpeta; // Carpeta asociada a la mochila
+    std::string carpeta;
 
     std::string asegurarExtensionTxt(const std::string& nombreArchivo) const {
         if (nombreArchivo.size() >= 4 &&
@@ -94,13 +91,16 @@ public:
             return;
         }
 
-        Fichero doc(rutaCompleta);
-        if (doc.getContenido() == "[No se pudo crear el archivo]") {
+        std::ofstream nuevoArchivo(rutaCompleta);
+        if (!nuevoArchivo) {
             std::cout << "No se pudo crear el archivo '" << nombreConTxt << "'.\n";
-        } else {
-            documentos.append(doc);
-            std::cout << "Documento '" << nombreConTxt << "' agregado a la mochila.\n";
+            return;
         }
+        nuevoArchivo.close();
+
+        Fichero doc(rutaCompleta);
+        documentos.append(doc);
+        std::cout << "Documento '" << nombreConTxt << "' agregado a la mochila.\n";
     }
 
     void eliminarDocumento(int pos) {
@@ -125,11 +125,12 @@ public:
         }
     }
 
-    void verContenidoDocumento(int pos) const {
+    void verContenidoDocumento(int pos) {
         if (pos < 1 || pos > documentos.getSize()) {
             std::cout << "Posición inválida.\n";
             return;
         }
+        documentos.get(pos).recargarContenido();
         std::cout << "Contenido de '" << fs::path(documentos.get(pos).getNombre()).filename().string() << "':\n";
         std::cout << documentos.get(pos).getContenido() << "\n";
         std::cout << "---------------------------\n";
@@ -140,6 +141,7 @@ public:
             std::cout << "Posición inválida.\n";
             return;
         }
+        documentos.get(pos).recargarContenido();
         std::cout << "Contenido actual de '" << fs::path(documentos.get(pos).getNombre()).filename().string() << "':\n";
         std::cout << documentos.get(pos).getContenido() << "\n";
         std::cout << "Ingrese el nuevo contenido (escriba la línea y pulse ENTER):\n";
@@ -151,8 +153,8 @@ public:
         if (archivo) {
             archivo << nuevoContenido << std::endl;
             archivo.close();
+            documentos.get(pos).recargarContenido();
             std::cout << "Archivo actualizado correctamente.\n";
-            documentos.get(pos).setContenido(nuevoContenido + "\n");
         } else {
             std::cout << "No se pudo abrir el archivo para editar.\n";
         }
@@ -160,4 +162,3 @@ public:
 };
 
 #endif // RECURSOS_MOCHILA_H
-
