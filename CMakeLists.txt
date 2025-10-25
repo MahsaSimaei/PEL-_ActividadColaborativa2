@@ -8,4 +8,5 @@ add_executable(PEL__ActividadColaborativa2 main.cpp
         Listas.h
         RecursosComunes.h
         RecursosMochila.h
-        SistemaAdmin.h)
+        SistemaAdmin.h
+        GestionAulas.h)

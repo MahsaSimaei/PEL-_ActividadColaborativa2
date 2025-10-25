@@ -8,6 +8,7 @@
 #include "RecursosComunes.h"
 #include "RecursosMochila.h"
 #include "SistemaAdmin.h"
+#include "GestionAulas.h"
 using namespace std;
 
 // =============================================================
@@ -53,36 +54,58 @@ void menuEstudiante(Estudiante& est) {
 // =============================================================
 // Menú del Profesor
 // =============================================================
-void menuProfesor() {
+inline void menuProfesor(GestionAulas* gestionAula) {
     int opcion = -1;
     while (opcion != 0) {
-        cout << "\n===== MENU PROFESOR =====\n"
-             << "1. Jugar: Adivina el número\n"
-             << "2. Calculadora avanzada\n"
-             << "0. Cerrar sesión\nOpción: ";
-        if (!(cin >> opcion)) {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Entrada no válida.\n";
+        std::cout << "\n===== MENU PROFESOR =====\n"
+                  << "1. Jugar: Adivina el número\n"
+                  << "2. Calculadora avanzada\n"
+                  << "3. Ver número de inscritos en el aula\n"
+                  << "4. Ver listado de estudiantes\n"
+                  << "5. Ver datos de un estudiante\n"
+                  << "0. Cerrar sesión\nOpción: ";
+        if (!(std::cin >> opcion)) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Entrada no válida.\n";
             continue;
         }
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         switch (opcion) {
             case 1:
                 jugarAdivinaNumero();
                 break;
             case 2:
-                inicioCalculadora();
+                 inicioCalculadora();
                 break;
+            case 3:
+                std::cout << "Número de inscritos: " << gestionAula->getNumeroInscritos() << std::endl;
+                break;
+            case 4:
+                std::cout << gestionAula->listadoEstudiantes();
+                break;
+            case 5: {
+                int id;
+                std::cout << "Ingrese el ID del estudiante: ";
+                std::cin >> id;
+                std::cin.ignore();
+                auto est = gestionAula->buscarEstudiante(id);
+                if (est)
+                    std::cout << est->toString() << std::endl;
+                else
+                    std::cout << "Estudiante no encontrado.\n";
+                break;
+            }
             case 0:
-                cout << "Cerrando sesión...\n";
+                std::cout << "Cerrando sesión...\n";
                 break;
             default:
-                cout << "Opción inválida.\n";
+                std::cout << "Opción inválida.\n";
         }
     }
 }
+
 
 // =============================================================
 // Menú del Administrador

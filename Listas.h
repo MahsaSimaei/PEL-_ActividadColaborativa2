@@ -40,6 +40,10 @@ public:
             ret = lista[pos - 1];
         return ret;
     }
+    void set(int pos, const T& valor) {
+        if (pos > 0 && pos <= (int)last)
+            lista[pos - 1] = valor;
+    }
 
     void erase(int pos) {
         if (pos <= 0 || pos > (int)last) {
