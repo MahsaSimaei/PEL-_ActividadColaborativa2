@@ -1,5 +1,5 @@
-#ifndef MENU_H
-#define MENU_H
+#ifndef MENUS_H
+#define MENUS_H
 
 #include <iostream>
 #include <string>
@@ -7,22 +7,8 @@
 #include "Listas.h"
 #include "RecursosComunes.h"
 #include "RecursosMochila.h"
+#include "SistemaAdmin.h"
 using namespace std;
-
-// =============================================================
-// Estructuras globales de gestión
-// =============================================================
-ListaDeObjetos<Estudiante>* estudiantes = new ListaDeObjetos<Estudiante>();
-ListaDeObjetos<Profesor>* profesores = new ListaDeObjetos<Profesor>();
-Admin* admin = new Admin("Admin", "Gonzalez", "xyz", 1);
-
-// Contador automático de IDs
-int nextId = 2;
-
-// =============================================================
-// Funciones auxiliares
-// =============================================================
-int generarId() { return nextId++; }
 
 // =============================================================
 // Menú del Estudiante
@@ -101,83 +87,84 @@ void menuProfesor() {
 // =============================================================
 // Menú del Administrador
 // =============================================================
-void menuAdministrador() {
-    int opcion = -1;
-    while (opcion != 0) {
-        cout << "\n===== MENU ADMINISTRADOR =====\n"
-             << "1. Dar de alta usuario\n"
-             << "2. Dar de baja usuario\n"
-             << "3. Listar usuarios\n"
-             << "0. Salir\nOpción: ";
-        if (!(cin >> opcion)) {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Entrada no válida.\n";
-            continue;
-        }
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+void menuAdministrador(SistemaAdmin& sistema) {
+    int opcion;
+    do {
+        std::cout << "\n== MENU ADMINISTRADOR ==\n";
+        std::cout << "1. Alta estudiante\n";
+        std::cout << "2. Alta profesor\n";
+        std::cout << "3. Alta administrador\n";
+        std::cout << "4. Baja usuario\n";
+        std::cout << "5. Modificar usuario\n";
+        std::cout << "6. Mostrar usuarios\n";
+        std::cout << "0. Salir\n";
+        std::cout << "Opción: ";
+        std::cin >> opcion;
+        std::cin.ignore();
 
         switch (opcion) {
             case 1: {
-                string nombre, apellido, pass;
-                int tipo;
-                cout << "Nombre: "; getline(cin, nombre);
-                cout << "Apellido: "; getline(cin, apellido);
-                cout << "Password: "; getline(cin, pass);
-                cout << "Tipo (1=Estudiante, 2=Profesor): ";
-                cin >> tipo;
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-                if (tipo == 1) {
-                    estudiantes->append(Estudiante(nombre, apellido, pass, generarId()));
-                    cout << "Estudiante dado de alta correctamente.\n";
-                } else {
-                    profesores->append(Profesor(nombre, apellido, pass, generarId()));
-                    cout << "Profesor dado de alta correctamente.\n";
-                }
+                std::string nombre, apellido, passwd;
+                std::cout << "Nombre: "; std::getline(std::cin, nombre);
+                std::cout << "Apellido: "; std::getline(std::cin, apellido);
+                std::cout << "Contraseña: "; std::getline(std::cin, passwd);
+                Estudiante* nuevo = sistema.altaEstudiante(nombre, apellido, passwd);
+                std::cout << "Estudiante creado: " << nuevo->toString() << std::endl;
                 break;
             }
-
             case 2: {
-                int tipo, id;
-                cout << "Tipo (1=Estudiante, 2=Profesor): ";
-                cin >> tipo;
-                cout << "ID a eliminar: ";
-                cin >> id;
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-                if (tipo == 1) {
-                    for (int i = 1; i <= estudiantes->getSize(); i++) {
-                        if (estudiantes->get(i).getId() == id) {
-                            estudiantes->erase(i);
-                            cout << "Estudiante eliminado correctamente.\n";
-                            break;
-                        }
-                    }
-                } else {
-                    for (int i = 1; i <= profesores->getSize(); i++) {
-                        if (profesores->get(i).getId() == id) {
-                            profesores->erase(i);
-                            cout << "Profesor eliminado correctamente.\n";
-                            break;
-                        }
-                    }
-                }
+                std::string nombre, apellido, passwd;
+                std::cout << "Nombre: "; std::getline(std::cin, nombre);
+                std::cout << "Apellido: "; std::getline(std::cin, apellido);
+                std::cout << "Contraseña: "; std::getline(std::cin, passwd);
+                Profesor* nuevo = sistema.altaProfesor(nombre, apellido, passwd);
+                std::cout << "Profesor creado: " << nuevo->toString() << std::endl;
                 break;
             }
-
-            case 3:
-                cout << "=== Estudiantes ===\n" << estudiantes->toString();
-                cout << "\n=== Profesores ===\n" << profesores->toString();
+            case 3: {
+                std::string nombre, apellido, passwd;
+                std::cout << "Nombre: "; std::getline(std::cin, nombre);
+                std::cout << "Apellido: "; std::getline(std::cin, apellido);
+                std::cout << "Contraseña: "; std::getline(std::cin, passwd);
+                Admin* nuevo = sistema.altaAdmin(nombre, apellido, passwd);
+                std::cout << "Administrador creado: " << nuevo->toString() << std::endl;
                 break;
-
+            }
+            case 4: {
+                int id;
+                std::cout << "ID a dar de baja: ";
+                std::cin >> id;
+                std::cin.ignore();
+                if (sistema.bajaUsuario(id))
+                    std::cout << "Usuario dado de baja correctamente.\n";
+                else
+                    std::cout << "Usuario no encontrado.\n";
+                break;
+            }
+            case 5: {
+                int id;
+                std::string nombre, apellido;
+                std::cout << "ID a modificar: ";
+                std::cin >> id;
+                std::cin.ignore();
+                std::cout << "Nuevo nombre: "; std::getline(std::cin, nombre);
+                std::cout << "Nuevo apellido: "; std::getline(std::cin, apellido);
+                if (sistema.modificarUsuario(id, nombre, apellido))
+                    std::cout << "Usuario modificado.\n";
+                else
+                    std::cout << "Usuario no encontrado.\n";
+                break;
+            }
+            case 6:
+                sistema.mostrarUsuarios();
+                break;
             case 0:
-                cout << "Saliendo del sistema...\n";
+                std::cout << "Saliendo del menú administrador.\n";
                 break;
             default:
-                cout << "Opción inválida.\n";
+                std::cout << "Opción inválida.\n";
         }
-    }
+    } while (opcion != 0);
 }
 
 // =============================================================
@@ -256,4 +243,4 @@ void menuMochila(MochilaDigital* mochila) {
     } while (opcion != 0);
 }
 
-#endif
+#endif // MENUS_H

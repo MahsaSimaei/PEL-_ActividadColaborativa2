@@ -7,4 +7,5 @@ add_executable(PEL__ActividadColaborativa2 main.cpp
         Menus.h
         Listas.h
         RecursosComunes.h
-        RecursosMochila.h)
+        RecursosMochila.h
+        SistemaAdmin.h)

@@ -1,70 +1,94 @@
 #include <iostream>
 #include <string>
 #include "Usuario.h"
-#include "Listas.h"
+#include "SistemaAdmin.h"
 #include "Menus.h"
 
-// Prototipos de los menús
-void menuAdministrador();
-void menuProfesor();
-void menuEstudiante(Estudiante& est);
-void menuMochila(MochilaDigital* mochila);
+using namespace std;
 
-int codigoRol(const std::string& nombre, const std::string& password) {
-    if (nombre == "admin" && password == "admin123")
-        return 1;
-    else if (nombre == "profe" && password == "profe123")
-        return 2;
-    else if (nombre == "estudiante" && password == "e123")
-        return 3;
-    else if (nombre == "estudiante2" && password == "e123")
-        return 3;
-    else
-        return 0;
+// Devuelve el código de rol para el usuario autenticado
+int codigoRol(const string& nombre, const string& password, const SistemaAdmin& sistema) {
+    for (int i = 1; i <= sistema.cantidadUsuarios(); ++i) {
+        Usuario* u = sistema.buscarUsuario(i);
+        if (u && u->getNombre() == nombre && u->getPasswd() == password && u->isAlta()) {
+            return u->getRol();
+        }
+    }
+    return 0;
 }
 
 int main() {
-    std::string nombre, password;
+    string nombre, password;
     int rolCode;
     bool acceso = false;
     int opcion;
+    SistemaAdmin sistema;
+
+    // Usuarios base
+    sistema.altaAdmin("admin", "Principal", "admin123");
+    sistema.altaProfesor("profe", "Ejemplo", "profe123");
+    sistema.altaProfesor("Maria", "Gomez", "profe123");
+    sistema.altaEstudiante("Juan", "Perez", "e123");
+    sistema.altaEstudiante("Ana", "Lopez", "e123");
+    sistema.altaEstudiante("Luis", "Martinez", "e123");
+    sistema.altaEstudiante("Sofia", "Garcia", "e123");
+
     do {
-        std::cout << "===== BIENVENIDO AL SISTEMA =====" << std::endl;
-        std::cout << "- - - - - - - - - - - - - - - - -"<< std::endl;
-        std::cout << "       1. Estudiante " << std::endl;
-        std::cout << "       2. Profesor(a) " << std::endl;
-        std::cout << "       3. Administrador " << std::endl;
-        std::cout << "Por favor, selecciona tu tipo de usuario:  " << std::endl;
+        cout << "===== BIENVENIDO AL SISTEMA =====" << endl;
+        cout << "       1. Estudiante " << endl;
+        cout << "       2. Profesor(a) " << endl;
+        cout << "       3. Administrador " << endl;
+        cout << "Por favor, selecciona tu tipo de usuario:  ";
+        if (!(cin >> opcion)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Entrada no válida.\n";
+            continue;
+        }
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-        std::cin >> opcion;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // limpia el buffer
+        cout << "Ingrese su nombre: ";
+        getline(cin, nombre);
 
-        std::cout << "Ingrese su nombre: ";
-        std::getline(std::cin, nombre);
+        cout << "Ingrese su password: ";
+        getline(cin, password);
 
-        std::cout << "Ingrese su password: ";
-        std::getline(std::cin, password);
-
-        rolCode = codigoRol(nombre, password);
+        rolCode = codigoRol(nombre, password, sistema);
 
         switch (rolCode) {
             case 1:
-                menuAdministrador();
+                cout << "Bienvenido, administrador " << nombre << "!\n";
+                menuAdministrador(sistema);
                 acceso = true;
                 break;
-            case 2:
-                menuProfesor();
-                acceso = true;
+            case 2: {
+                cout << "Bienvenido, profesor " << nombre << "!\n";
+                // Busca el usuario para pasar referencia al menú
+                for (int i = 1; i <= sistema.cantidadUsuarios(); ++i) {
+                    Usuario* u = sistema.buscarUsuario(i);
+                    if (u && u->getNombre() == nombre && u->getRol() == 2 && u->isAlta()) {
+                        menuProfesor();
+                        acceso = true;
+                        break;
+                    }
+                }
                 break;
+            }
             case 3: {
-                Estudiante* est = new Estudiante(nombre, "Apellido", password, 1);
-                menuEstudiante(*est);
-                delete est;
-                acceso = true;
+                cout << "Bienvenido, estudiante " << nombre << "!\n";
+                // Busca el usuario para pasar referencia al menú
+                for (int i = 1; i <= sistema.cantidadUsuarios(); ++i) {
+                    Usuario* u = sistema.buscarUsuario(i);
+                    if (u && u->getNombre() == nombre && u->getRol() == 3 && u->isAlta()) {
+                        menuEstudiante(*(Estudiante*)u);
+                        acceso = true;
+                        break;
+                    }
+                }
                 break;
             }
             default:
-                std::cout << "\n*** ERROR: Usuario o password incorrecto. Intente de nuevo. ***\n" << std::endl;
+                cout << "\n*** ERROR: Usuario o password incorrecto. Intente de nuevo. ***\n" << endl;
                 break;
         }
     } while (!acceso);
