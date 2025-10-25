@@ -4,6 +4,9 @@
 #include <iostream>
 #include <string>
 #include "Usuario.h"
+#include "Listas.h"
+#include "RecursosComunes.h"
+#include "RecursosMochila.h"
 using namespace std;
 
 // =============================================================
@@ -24,47 +27,39 @@ int generarId() { return nextId++; }
 // =============================================================
 // Menú del Estudiante
 // =============================================================
+void menuMochila(MochilaDigital* mochila);
+
 void menuEstudiante(Estudiante& est) {
     int opcion = -1;
     while (opcion != 0) {
         cout << "\n===== MENU ESTUDIANTE =====\n"
-             << "1. Agregar archivo a mochila\n"
-             << "2. Ver mochila\n"
-             << "3. Eliminar archivo\n"
-             << "4. Calculadora avanzada\n"
-             << "5. Juego de adivinanza\n"
-             << "0. Cerrar sesion\nOpcion: ";
-        cin >> opcion;
+             << "1. Gestionar mochila digital\n"
+             << "2. Jugar: Adivina el número\n"
+             << "3. Calculadora avanzada\n"
+             << "0. Cerrar sesión\nOpción: ";
+        if (!(cin >> opcion)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Entrada no válida.\n";
+            continue;
+        }
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         switch (opcion) {
-            case 1: {
-                string archivo;
-                cout << "Ingrese nombre del archivo: ";
-                cin >> archivo;
-                est.agregarArchivo(archivo);
-                cout << "Archivo agregado correctamente.\n";
+            case 1:
+                menuMochila(est.getMochila());
                 break;
-            }
             case 2:
-                cout << est.verMochila();
+                jugarAdivinaNumero();
                 break;
-            case 3: {
-                int pos;
-                cout << "Posición a eliminar: ";
-                cin >> pos;
-                est.eliminarArchivo(pos);
-                cout << "Archivo eliminado.\n";
-                break;
-            }
-            case 4:
+            case 3:
                 inicioCalculadora();
-                break;
-            case 5:
-                juegoRecurso5();
                 break;
             case 0:
                 cout << "Cerrando sesión...\n";
                 break;
+            default:
+                cout << "Opción inválida.\n";
         }
     }
 }
@@ -72,40 +67,33 @@ void menuEstudiante(Estudiante& est) {
 // =============================================================
 // Menú del Profesor
 // =============================================================
-void menuProfesor(Profesor& prof) {
+void menuProfesor() {
     int opcion = -1;
     while (opcion != 0) {
         cout << "\n===== MENU PROFESOR =====\n"
-             << "1. Ver estudiantes\n"
-             << "2. Agregar estudiante a clase\n"
-             << "3. Calculadora avanzada\n"
-             << "4. Juego de adivinanza\n"
-             << "0. Cerrar sesion\nOpcion: ";
-        cin >> opcion;
+             << "1. Jugar: Adivina el número\n"
+             << "2. Calculadora avanzada\n"
+             << "0. Cerrar sesión\nOpción: ";
+        if (!(cin >> opcion)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Entrada no válida.\n";
+            continue;
+        }
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         switch (opcion) {
             case 1:
-                cout << prof.toString();
+                jugarAdivinaNumero();
                 break;
-            case 2: {
-                string nombre, apellido, pass;
-                cout << "Nombre: "; cin >> nombre;
-                cout << "Apellido: "; cin >> apellido;
-                cout << "Password: "; cin >> pass;
-                Estudiante nuevo(nombre, apellido, pass, generarId());
-                prof.agregarEstudiante(nuevo);
-                cout << "Estudiante agregado a la clase.\n";
-                break;
-            }
-            case 3:
+            case 2:
                 inicioCalculadora();
-                break;
-            case 4:
-                juegoRecurso5();
                 break;
             case 0:
                 cout << "Cerrando sesión...\n";
                 break;
+            default:
+                cout << "Opción inválida.\n";
         }
     }
 }
@@ -120,18 +108,25 @@ void menuAdministrador() {
              << "1. Dar de alta usuario\n"
              << "2. Dar de baja usuario\n"
              << "3. Listar usuarios\n"
-             << "0. Salir\nOpcion: ";
-        cin >> opcion;
+             << "0. Salir\nOpción: ";
+        if (!(cin >> opcion)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Entrada no válida.\n";
+            continue;
+        }
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         switch (opcion) {
             case 1: {
                 string nombre, apellido, pass;
                 int tipo;
-                cout << "Nombre: "; cin >> nombre;
-                cout << "Apellido: "; cin >> apellido;
-                cout << "Password: "; cin >> pass;
+                cout << "Nombre: "; getline(cin, nombre);
+                cout << "Apellido: "; getline(cin, apellido);
+                cout << "Password: "; getline(cin, pass);
                 cout << "Tipo (1=Estudiante, 2=Profesor): ";
                 cin >> tipo;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
                 if (tipo == 1) {
                     estudiantes->append(Estudiante(nombre, apellido, pass, generarId()));
@@ -149,6 +144,7 @@ void menuAdministrador() {
                 cin >> tipo;
                 cout << "ID a eliminar: ";
                 cin >> id;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
                 if (tipo == 1) {
                     for (int i = 1; i <= estudiantes->getSize(); i++) {
@@ -178,8 +174,86 @@ void menuAdministrador() {
             case 0:
                 cout << "Saliendo del sistema...\n";
                 break;
+            default:
+                cout << "Opción inválida.\n";
         }
     }
+}
+
+// =============================================================
+// Menú Mochila Digital
+// =============================================================
+void menuMochila(MochilaDigital* mochila) {
+    int opcion;
+    do {
+        cout << "\n--- Menú Mochila Digital ---\n";
+        cout << "1. Agregar documento\n";
+        cout << "2. Eliminar documento\n";
+        cout << "3. Ver documentos\n";
+        cout << "4. Ver contenido de un documento\n";
+        cout << "5. Editar contenido de un documento\n";
+        cout << "0. Salir\n";
+        cout << "Opción: ";
+        cin >> opcion;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        switch (opcion) {
+            case 1: {
+                string nombre;
+                cout << "Nombre del archivo a agregar: ";
+                getline(cin, nombre);
+                mochila->agregarDocumento(nombre);
+                break;
+            }
+            case 2: {
+                int pos;
+                cout << "Posición del documento a eliminar (1,2,...): ";
+                if (!(cin >> pos)) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Debe ingresar un número válido.\n";
+                    break;
+                }
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                mochila->eliminarDocumento(pos);
+                break;
+            }
+            case 3:
+                mochila->verDocumentos();
+                break;
+            case 4: {
+                int pos;
+                cout << "Posición del documento a ver contenido (1,2,...): ";
+                if (!(cin >> pos)) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Debe ingresar un número válido.\n";
+                    break;
+                }
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                mochila->verContenidoDocumento(pos);
+                break;
+            }
+            case 5: {
+                int pos;
+                cout << "Posición del documento a editar (1,2,...): ";
+                if (!(cin >> pos)) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Debe ingresar un número válido.\n";
+                    break;
+                }
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                mochila->editarContenidoDocumento(pos);
+                break;
+            }
+            case 0:
+                cout << "Saliendo del menú de la mochila.\n";
+                break;
+            default:
+                cout << "Opción inválida.\n";
+        }
+    } while (opcion != 0);
 }
 
 #endif
