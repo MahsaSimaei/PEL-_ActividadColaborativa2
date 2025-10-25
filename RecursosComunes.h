@@ -97,7 +97,140 @@ inline void multiplicacionMat(int** a, int** b, int** resultado, int n) {
                 resultado[i][j] += a[i][k] * b[k][j];
         }
 }
+/* Crear y liberar matrices double (por fila, estilo principiante) */
+double** matrizDouble(int n) {
+    double** m = new double*[n];
+    for (int i = 0; i < n; ++i) {
+        m[i] = new double[n];
+        for (int j = 0; j < n; ++j) m[i][j] = 0.0;
+    }
+    return m;
+}
 
+void eliminarMatrizDouble(double** m, int n) {
+    if (!m) return;
+    for (int i = 0; i < n; ++i) delete[] m[i];
+    delete[] m;
+}
+
+/* Imprimir matriz double */
+inline void imprimirMatrizDouble(double** matriz, int n) {
+    std::cout << std::fixed << std::setprecision(6);
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j)
+            std::cout << matriz[i][j] << " ";
+        std::cout << std::endl;
+    }
+}
+
+/* Multiplicación de matrices double n x n */
+void multiplicacionMatDouble(double** a, double** b, double** resultado, int n) {
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j) {
+            double sum = 0.0;
+            for (int k = 0; k < n; ++k)
+                sum += a[i][k] * b[k][j];
+            resultado[i][j] = sum;
+        }
+}
+
+/* Invertir matriz usando Gauss-Jordan con pivoteo parcial.
+   Devuelve true si se invirtió correctamente, false si la matriz es singular. */
+bool invertirMatriz(double** A, double** inv, int n) {
+    const double EPS = 1e-12;
+    /* Matriz aumentada n x (2n) */
+    double** aug = new double*[n];
+    for (int i = 0; i < n; ++i) {
+        aug[i] = new double[2 * n];
+    }
+
+    /* Rellenar la aumentada [A | I] */
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) aug[i][j] = A[i][j];
+        for (int j = 0; j < n; ++j) aug[i][n + j] = (i == j) ? 1.0 : 0.0;
+    }
+
+    /* Gauss-Jordan */
+    for (int col = 0; col < n; ++col) {
+        /* Buscar pivote (fila con máximo absoluto en la columna 'col') */
+        int pivot_row = col;
+        double maxabs = std::fabs(aug[col][col]);
+        for (int r = col + 1; r < n; ++r) {
+            double v = std::fabs(aug[r][col]);
+            if (v > maxabs) { maxabs = v; pivot_row = r; }
+        }
+        if (maxabs < EPS) {
+            /* Singular */
+            for (int i = 0; i < n; ++i) delete[] aug[i];
+            delete[] aug;
+            return false;
+        }
+
+        /* Intercambiar filas si hace falta */
+        if (pivot_row != col) {
+            double* tmp = aug[col];
+            aug[col] = aug[pivot_row];
+            aug[pivot_row] = tmp;
+        }
+
+        /* Normalizar fila pivote */
+        double pivot = aug[col][col];
+        for (int c = 0; c < 2 * n; ++c) aug[col][c] /= pivot;
+
+        /* Eliminar otras filas */
+        for (int r = 0; r < n; ++r) {
+            if (r == col) continue;
+            double factor = aug[r][col];
+            if (std::fabs(factor) > 0.0) {
+                for (int c = 0; c < 2 * n; ++c)
+                    aug[r][c] -= factor * aug[col][c];
+            }
+        }
+    }
+
+    /* Copiar la parte derecha (inversa) */
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
+            inv[i][j] = aug[i][n + j];
+
+    /* Liberar aumentada */
+    for (int i = 0; i < n; ++i) delete[] aug[i];
+    delete[] aug;
+    return true;
+}
+
+/* División de matrices interpretada como A * inv(B).
+   a, b son int**; resultado es double** (para conservar fracciones).
+   Devuelve true si operación exitosa, false si B no es invertible. */
+bool divisionInversaMat(int** a, int** b, double** resultado, int n) {
+    /* Convertir a double */
+    double** Ad = matrizDouble(n);
+    double** Bd = matrizDouble(n);
+    double** invB = matrizDouble(n);
+
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j) {
+            Ad[i][j] = static_cast<double>(a[i][j]);
+            Bd[i][j] = static_cast<double>(b[i][j]);
+        }
+
+    bool ok = invertirMatriz(Bd, invB, n);
+    if (!ok) {
+        eliminarMatrizDouble(Ad, n);
+        eliminarMatrizDouble(Bd, n);
+        eliminarMatrizDouble(invB, n);
+        return false;
+    }
+
+    multiplicacionMatDouble(Ad, invB, resultado, n);
+
+    eliminarMatrizDouble(Ad, n);
+    eliminarMatrizDouble(Bd, n);
+    eliminarMatrizDouble(invB, n);
+    return true;
+}
+
+/* Imprimir matriz int (existente) */
 inline void imprimirMatriz(int** matriz, int n) {
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j)
@@ -174,6 +307,7 @@ inline void inicioCalculadora() {
                     std::cout << "          5. + Suma " << std::endl;
                     std::cout << "          6. - Resta " << std::endl;
                     std::cout << "          7. x Multiplicación " << std::endl;
+                    std::cout << "          8. / División " << std::endl;
                     std::cout << " ---------------------------------------- " << std::endl;
                     std::cout << "          0. Regresar " << std::endl;
                     std::cin >> opcion2;
@@ -226,6 +360,20 @@ inline void inicioCalculadora() {
                         imprimirMatriz(resultado, n);
                         opcion2 = 0;
                         break;
+                    case 8: {
+                        /* Para la división utilizamos double para el resultado */
+                        double** resultadoD = matrizDouble(n);
+                        bool ok = divisionInversaMat(matrizA, matrizB, resultadoD, n);
+                        if (ok) {
+                            std::cout << "Resultado de la división:" << std::endl;
+                            imprimirMatrizDouble(resultadoD, n);
+                        } else {
+                            std::cout << "No se pudo invertir B (es singular)." << std::endl;
+                        }
+                        eliminarMatrizDouble(resultadoD, n);
+                        opcion2 = 0;
+                        break;
+                    }
                 }
             }
         }
@@ -243,5 +391,4 @@ inline void inicioCalculadora() {
         }
     }
 }
-
 #endif // RECURSOS_COMUNES_H
