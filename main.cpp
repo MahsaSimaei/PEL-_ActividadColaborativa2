@@ -43,7 +43,7 @@ void asociarAulasYEstudiantes(SistemaAdmin& sistema, ListaDeObjetos<ParIdAula>& 
 
     // Crear aulas para cada profesor
     for (int i = 1; i <= sistema.cantidadProfesores(); ++i) {
-        Profesor* profe = sistema.buscarProfesor(i);
+        Profesor* profe = sistema.buscarProfesorPorIndice(i);
         if (profe) {
             GestionAulas* gestion = new GestionAulas(profe);
             aulas.append(ParIdAula(profe->getId(), gestion));
@@ -54,7 +54,7 @@ void asociarAulasYEstudiantes(SistemaAdmin& sistema, ListaDeObjetos<ParIdAula>& 
 
     // Asignar estudiantes a profesores
     for (int i = 1; i <= sistema.cantidadEstudiantes(); ++i) {
-        Estudiante* est = sistema.buscarEstudiante(i);
+        Estudiante* est = sistema.buscarEstudiantePorIndice(i);
         if (est) {
             if ((est->getNombre() == "Juan" || est->getNombre() == "Ana") && idProfe != -1)
                 buscarAulaPorId(aulas, idProfe)->agregarEstudiante(est);
@@ -97,7 +97,7 @@ int main() {
         case 1: { // Estudiante
             bool encontrado = false;
             for (int i = 1; i <= sistema.cantidadEstudiantes(); ++i) {
-                Estudiante* est = sistema.buscarEstudiante(i);
+                Estudiante* est = sistema.buscarEstudiantePorIndice(i);
                 if (est && est->getNombre() == nombre && est->getPasswd() == password && est->isAlta()) {
                     cout << "Bienvenido, estudiante " << nombre << "!\n";
                     menuEstudiante(*est);
@@ -113,7 +113,7 @@ int main() {
         case 2: { // Profesor
             bool encontrado = false;
             for (int i = 1; i <= sistema.cantidadProfesores(); ++i) {
-                Profesor* profe = sistema.buscarProfesor(i);
+                Profesor* profe = sistema.buscarProfesorPorIndice(i);
                 if (profe && profe->getNombre() == nombre && profe->getPasswd() == password && profe->isAlta()) {
                     cout << "Bienvenido, profesor " << nombre << "!\n";
                     GestionAulas* aula = buscarAulaPorId(aulas, profe->getId());

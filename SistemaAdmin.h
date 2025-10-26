@@ -225,6 +225,17 @@ public:
         }
         return nullptr;
     }
+    // NUEVO: buscar estudiante por posición en lista (índice 1..N)
+    Estudiante* buscarEstudiantePorIndice(int idx) const {
+        if (idx >= 1 && idx <= estudiantes.getSize())
+            return estudiantes.get(idx);
+        return nullptr;
+    }
+    Profesor* buscarProfesorPorIndice(int idx) const {
+        if (idx >= 1 && idx <= profesores.getSize())
+            return profesores.get(idx);
+        return nullptr;
+    }
 };
 
 #endif //SISTEMAADMIN_H
