@@ -1,25 +1,22 @@
-#ifndef RECURSOS_COMUNES_H
-#define RECURSOS_COMUNES_H
-
 #include <iostream>
 #include <random>
 #include <limits>
 #include <cmath>
+#include <iomanip>
+#include "Listas.h"
 
-// ==================== Juego "Adivina el número" ====================
+// ==================== Juego "Adivina el número"  ====================
 class JuegoAdivinaNumero {
 private:
     int numero_secreto;
-    int intentos;
+    ListaDeObjetos<int> intentos;
 public:
     JuegoAdivinaNumero() {
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> dis(1, 100);
         numero_secreto = dis(gen);
-        intentos = 0;
     }
-
     void jugar() {
         int adivinanza;
         bool adivinado = false;
@@ -31,7 +28,7 @@ public:
                 std::cout << "Entrada no válida. Por favor, introduce un número (1-100).\n";
                 continue;
             }
-            intentos++;
+            intentos.append(adivinanza);
             int diferencia = std::abs(adivinanza - numero_secreto);
             if (adivinanza < numero_secreto) {
                 if (diferencia > 10)
@@ -44,7 +41,11 @@ public:
                 else
                     std::cout << "Alto. ¡Intentalo de nuevo!\n";
             } else {
-                std::cout << "¡Felicidades! Adivinaste el número en " << intentos << " intentos!\n";
+                std::cout << "¡Felicidades! Adivinaste el número en " << intentos.getSize() << " intentos!\n";
+                std::cout << "Tus intentos fueron: ";
+                for (int i = 1; i <= intentos.getSize(); i++)
+                    std::cout << intentos.get(i) << " ";
+                std::cout << std::endl;
                 adivinado = true;
             }
         }
@@ -57,65 +58,30 @@ inline void jugarAdivinaNumero() {
 }
 
 // ==================== Calculadora Avanzada ====================
-inline void suma(int x, int y) {
-    std::cout << x << " + " << y << " = " << (x + y) << std::endl;
-}
 
-inline void resta(int x, int y) {
-    std::cout << x << " - " << y << " = " << (x - y) << std::endl;
-}
-
-inline void multiplicacion(int x, int y) {
-    std::cout << x << " x " << y << " = " << (x * y) << std::endl;
-}
-
-inline void division(int x, int y) {
-    if (y != 0) {
-        std::cout << x << " / " << y << " = " << (x / y) << std::endl;
-    } else {
-        std::cout << "Error: División entre 0." << std::endl;
-    }
-}
-
-inline void sumaMat(int** a, int** b, int** resultado, int n) {
-    for (int i = 0; i < n; ++i)
-        for (int j = 0; j < n; ++j)
-            resultado[i][j] = a[i][j] + b[i][j];
-}
-
-inline void restaMat(int** a, int** b, int** resultado, int n) {
-    for (int i = 0; i < n; ++i)
-        for (int j = 0; j < n; ++j)
-            resultado[i][j] = a[i][j] - b[i][j];
-}
-
-inline void multiplicacionMat(int** a, int** b, int** resultado, int n) {
-    for (int i = 0; i < n; ++i)
-        for (int j = 0; j < n; ++j) {
-            resultado[i][j] = 0;
-            for (int k = 0; k < n; ++k)
-                resultado[i][j] += a[i][k] * b[k][j];
-        }
-}
-/* Crear y liberar matrices double (por fila, estilo principiante) */
-double** matrizDouble(int n) {
-    double** m = new double*[n];
+inline int** matrizInt(int n) {
+    int** m = new(std::nothrow) int*[n];
+    if (!m) return nullptr;
     for (int i = 0; i < n; ++i) {
-        m[i] = new double[n];
-        for (int j = 0; j < n; ++j) m[i][j] = 0.0;
+        m[i] = new(std::nothrow) int[n];
+        if (!m[i]) {
+            for (int j = 0; j < i; ++j) delete[] m[j];
+            delete[] m;
+            return nullptr;
+        }
+        for (int j = 0; j < n; ++j) m[i][j] = 0;
     }
     return m;
 }
 
-void eliminarMatrizDouble(double** m, int n) {
+inline void eliminarMatrizInt(int** m, int n) {
     if (!m) return;
     for (int i = 0; i < n; ++i) delete[] m[i];
     delete[] m;
 }
 
-/* Imprimir matriz double */
-inline void imprimirMatrizDouble(double** matriz, int n) {
-    std::cout << std::fixed << std::setprecision(6);
+inline void imprimirMatriz(int** matriz, int n) {
+    if (!matriz) return;
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j)
             std::cout << matriz[i][j] << " ";
@@ -123,8 +89,58 @@ inline void imprimirMatrizDouble(double** matriz, int n) {
     }
 }
 
-/* Multiplicación de matrices double n x n */
-void multiplicacionMatDouble(double** a, double** b, double** resultado, int n) {
+inline void sumaMat(int** a, int** b, int** resultado, int n) {
+    if (!a || !b || !resultado) return;
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
+            resultado[i][j] = a[i][j] + b[i][j];
+}
+inline void restaMat(int** a, int** b, int** resultado, int n) {
+    if (!a || !b || !resultado) return;
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
+            resultado[i][j] = a[i][j] - b[i][j];
+}
+inline void multiplicacionMat(int** a, int** b, int** resultado, int n) {
+    if (!a || !b || !resultado) return;
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j) {
+            resultado[i][j] = 0;
+            for (int k = 0; k < n; ++k)
+                resultado[i][j] += a[i][k] * b[k][j];
+        }
+}
+
+inline double** matrizDouble(int n) {
+    double** m = new(std::nothrow) double*[n];
+    if (!m) return nullptr;
+    for (int i = 0; i < n; ++i) {
+        m[i] = new(std::nothrow) double[n];
+        if (!m[i]) {
+            for (int j = 0; j < i; ++j) delete[] m[j];
+            delete[] m;
+            return nullptr;
+        }
+        for (int j = 0; j < n; ++j) m[i][j] = 0.0;
+    }
+    return m;
+}
+inline void eliminarMatrizDouble(double** m, int n) {
+    if (!m) return;
+    for (int i = 0; i < n; ++i) delete[] m[i];
+    delete[] m;
+}
+inline void imprimirMatrizDouble(double** matriz, int n) {
+    if (!matriz) return;
+    std::cout << std::fixed << std::setprecision(6);
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j)
+            std::cout << matriz[i][j] << " ";
+        std::cout << std::endl;
+    }
+}
+inline void multiplicacionMatDouble(double** a, double** b, double** resultado, int n) {
+    if (!a || !b || !resultado) return;
     for (int i = 0; i < n; ++i)
         for (int j = 0; j < n; ++j) {
             double sum = 0.0;
@@ -133,26 +149,23 @@ void multiplicacionMatDouble(double** a, double** b, double** resultado, int n) 
             resultado[i][j] = sum;
         }
 }
-
-/* Invertir matriz usando Gauss-Jordan con pivoteo parcial.
-   Devuelve true si se invirtió correctamente, false si la matriz es singular. */
-bool invertirMatriz(double** A, double** inv, int n) {
+inline bool invertirMatriz(double** A, double** inv, int n) {
     const double EPS = 1e-12;
-    /* Matriz aumentada n x (2n) */
-    double** aug = new double*[n];
+    double** aug = matrizDouble(n);
+    if (!aug) return false;
     for (int i = 0; i < n; ++i) {
-        aug[i] = new double[2 * n];
+        aug[i] = new(std::nothrow) double[2 * n];
+        if (!aug[i]) {
+            for (int j = 0; j < i; ++j) delete[] aug[j];
+            eliminarMatrizDouble(aug, n);
+            return false;
+        }
     }
-
-    /* Rellenar la aumentada [A | I] */
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) aug[i][j] = A[i][j];
         for (int j = 0; j < n; ++j) aug[i][n + j] = (i == j) ? 1.0 : 0.0;
     }
-
-    /* Gauss-Jordan */
     for (int col = 0; col < n; ++col) {
-        /* Buscar pivote (fila con máximo absoluto en la columna 'col') */
         int pivot_row = col;
         double maxabs = std::fabs(aug[col][col]);
         for (int r = col + 1; r < n; ++r) {
@@ -160,24 +173,17 @@ bool invertirMatriz(double** A, double** inv, int n) {
             if (v > maxabs) { maxabs = v; pivot_row = r; }
         }
         if (maxabs < EPS) {
-            /* Singular */
             for (int i = 0; i < n; ++i) delete[] aug[i];
             delete[] aug;
             return false;
         }
-
-        /* Intercambiar filas si hace falta */
         if (pivot_row != col) {
             double* tmp = aug[col];
             aug[col] = aug[pivot_row];
             aug[pivot_row] = tmp;
         }
-
-        /* Normalizar fila pivote */
         double pivot = aug[col][col];
         for (int c = 0; c < 2 * n; ++c) aug[col][c] /= pivot;
-
-        /* Eliminar otras filas */
         for (int r = 0; r < n; ++r) {
             if (r == col) continue;
             double factor = aug[r][col];
@@ -187,33 +193,28 @@ bool invertirMatriz(double** A, double** inv, int n) {
             }
         }
     }
-
-    /* Copiar la parte derecha (inversa) */
     for (int i = 0; i < n; ++i)
         for (int j = 0; j < n; ++j)
             inv[i][j] = aug[i][n + j];
-
-    /* Liberar aumentada */
     for (int i = 0; i < n; ++i) delete[] aug[i];
     delete[] aug;
     return true;
 }
-
-/* División de matrices interpretada como A * inv(B).
-   a, b son int**; resultado es double** (para conservar fracciones).
-   Devuelve true si operación exitosa, false si B no es invertible. */
-bool divisionInversaMat(int** a, int** b, double** resultado, int n) {
-    /* Convertir a double */
+inline bool divisionInversaMat(int** a, int** b, double** resultado, int n) {
     double** Ad = matrizDouble(n);
     double** Bd = matrizDouble(n);
     double** invB = matrizDouble(n);
-
+    if (!Ad || !Bd || !invB) {
+        eliminarMatrizDouble(Ad, n);
+        eliminarMatrizDouble(Bd, n);
+        eliminarMatrizDouble(invB, n);
+        return false;
+    }
     for (int i = 0; i < n; ++i)
         for (int j = 0; j < n; ++j) {
             Ad[i][j] = static_cast<double>(a[i][j]);
             Bd[i][j] = static_cast<double>(b[i][j]);
         }
-
     bool ok = invertirMatriz(Bd, invB, n);
     if (!ok) {
         eliminarMatrizDouble(Ad, n);
@@ -221,30 +222,30 @@ bool divisionInversaMat(int** a, int** b, double** resultado, int n) {
         eliminarMatrizDouble(invB, n);
         return false;
     }
-
     multiplicacionMatDouble(Ad, invB, resultado, n);
-
     eliminarMatrizDouble(Ad, n);
     eliminarMatrizDouble(Bd, n);
     eliminarMatrizDouble(invB, n);
     return true;
 }
 
-/* Imprimir matriz int (existente) */
-inline void imprimirMatriz(int** matriz, int n) {
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j)
-            std::cout << matriz[i][j] << " ";
-        std::cout << std::endl;
-    }
+inline void suma(int x, int y) {
+    std::cout << x << " + " << y << " = " << (x + y) << std::endl;
+}
+inline void resta(int x, int y) {
+    std::cout << x << " - " << y << " = " << (x - y) << std::endl;
+}
+inline void multiplicacion(int x, int y) {
+    std::cout << x << " x " << y << " = " << (x * y) << std::endl;
+}
+inline void division(int x, int y) {
+    if (y != 0) std::cout << x << " / " << y << " = " << (x / y) << std::endl;
+    else std::cout << "Error: División entre 0." << std::endl;
 }
 
 inline void inicioCalculadora() {
     int opcion1 = -1, opcion2 = -1, num1, num2, n;
-    int** matrizA = nullptr;
-    int** matrizB = nullptr;
-    int** resultado = nullptr;
-
+    ListaDeObjetos<int**> matricesGuardadas;
     while (opcion1 != 0) {
         std::cout << " *******   C A L C U L A D O R A  ******* " << std::endl;
         std::cout << " ---------------------------------------- " << std::endl;
@@ -253,7 +254,9 @@ inline void inicioCalculadora() {
         std::cout << " ---------------------------------------- " << std::endl;
         std::cout << "          0. Salir " << std::endl;
         std::cin >> opcion1;
-
+        int** matrizA = nullptr;
+        int** matrizB = nullptr;
+        int** resultado = nullptr;
         if (opcion1 == 1 || opcion1 == 2) {
             opcion2 = -1;
             while (opcion2 != 0) {
@@ -268,7 +271,6 @@ inline void inicioCalculadora() {
                     std::cout << " ---------------------------------------- " << std::endl;
                     std::cout << "          0. Regresar " << std::endl;
                     std::cin >> opcion2;
-
                 } else if (opcion1 == 2) {
                     std::cout << " *******   C A L C U L A D O R A  ******* " << std::endl;
                     std::cout << " ---------------------------------------- " << std::endl;
@@ -276,32 +278,33 @@ inline void inicioCalculadora() {
                     std::cout << " ---------------------------------------- " << std::endl;
                     std::cout << "Ingrese el tamaño (n) de la matriz (n x n): " << std::endl;
                     std::cin >> n;
-
-                    matrizA = new int*[n];
-                    matrizB = new int*[n];
-                    resultado = new int*[n];
-
-                    for (int i = 0; i < n; ++i) {
-                        matrizA[i] = new int[n];
-                        matrizB[i] = new int[n];
-                        resultado[i] = new int[n];
+                    matrizA = matrizInt(n);
+                    matrizB = matrizInt(n);
+                    resultado = matrizInt(n);
+                    if (!matrizA || !matrizB || !resultado) {
+                        std::cout << "Error reservando memoria para las matrices." << std::endl;
+                        eliminarMatrizInt(matrizA, n);
+                        eliminarMatrizInt(matrizB, n);
+                        eliminarMatrizInt(resultado, n);
+                        matrizA = matrizB = resultado = nullptr;
+                        opcion2 = 0;
+                        continue;
                     }
-
+                    matricesGuardadas.append(matrizA);
+                    matricesGuardadas.append(matrizB);
+                    matricesGuardadas.append(resultado);
                     std::cout << "Ingrese los elementos de la primera matriz:" << std::endl;
                     for (int i = 0; i < n; ++i)
                         for (int j = 0; j < n; ++j)
                             std::cin >> matrizA[i][j];
-
                     std::cout << "Ingrese los elementos de la segunda matriz:" << std::endl;
                     for (int i = 0; i < n; ++i)
                         for (int j = 0; j < n; ++j)
                             std::cin >> matrizB[i][j];
-
                     std::cout << "Matriz A:" << std::endl;
                     imprimirMatriz(matrizA, n);
                     std::cout << "Matriz B:" << std::endl;
                     imprimirMatriz(matrizB, n);
-
                     std::cout << " ---------------------------------------- " << std::endl;
                     std::cout << "       Seleccione una operación:  " << std::endl;
                     std::cout << "          5. + Suma " << std::endl;
@@ -312,7 +315,6 @@ inline void inicioCalculadora() {
                     std::cout << "          0. Regresar " << std::endl;
                     std::cin >> opcion2;
                 }
-
                 switch (opcion2) {
                     case 1:
                         std::cout << "Ingrese el primer número: " << std::endl;
@@ -361,8 +363,11 @@ inline void inicioCalculadora() {
                         opcion2 = 0;
                         break;
                     case 8: {
-                        /* Para la división utilizamos double para el resultado */
                         double** resultadoD = matrizDouble(n);
+                        if (!resultadoD) {
+                            std::cout << "Error reservando memoria para la matriz de resultado." << std::endl;
+                            break;
+                        }
                         bool ok = divisionInversaMat(matrizA, matrizB, resultadoD, n);
                         if (ok) {
                             std::cout << "Resultado de la división:" << std::endl;
@@ -377,18 +382,10 @@ inline void inicioCalculadora() {
                 }
             }
         }
-        // Liberación de memoria para matrices dinámicas
-        if (matrizA != nullptr) {
-            for (int i = 0; i < n; ++i) {
-                delete[] matrizA[i];
-                delete[] matrizB[i];
-                delete[] resultado[i];
-            }
-            delete[] matrizA;
-            delete[] matrizB;
-            delete[] resultado;
-            matrizA = matrizB = resultado = nullptr;
+        // Liberación de matrices creadas (desde la lista)
+        for (int i = 1; i <= matricesGuardadas.getSize(); i++) {
+            int** mat = matricesGuardadas.get(i);
+            if (mat) eliminarMatrizInt(mat, n);
         }
     }
 }
-#endif // RECURSOS_COMUNES_H
