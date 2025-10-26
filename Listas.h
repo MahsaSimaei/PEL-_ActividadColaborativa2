@@ -34,12 +34,18 @@ public:
         last++;
     }
 
-    T get(int pos) const {
-        T ret{};
+    T& get(int pos) {
         if (pos > 0 && pos <= (int)last)
-            ret = lista[pos - 1];
-        return ret;
+            return lista[pos - 1];
+        throw std::out_of_range("Posición inválida en get()");
     }
+
+    const T& get(int pos) const {
+        if (pos > 0 && pos <= (int)last)
+            return lista[pos - 1];
+        throw std::out_of_range("Posición inválida en get()");
+    }
+
     void set(int pos, const T& valor) {
         if (pos > 0 && pos <= (int)last)
             lista[pos - 1] = valor;
